@@ -26,3 +26,24 @@ func TestCopyArray(t *testing.T){
 			t.Error("Expected", 0, "result", mismatch)
 		}
 }
+
+func TestCopyMap(t *testing.T){
+	exp := map[string]string{
+		"india":"Taj Mahal",
+		"china":"The Great Wall",
+		"jordan":"Petra",
+		"mexico":"Chichen Itza",
+		"peru":"Machu Picchu",
+		"italy":"The Colosseum",
+		"brazil":"Christ The Redeemer",
+	}
+
+	act := map[string]string{}
+
+	mismatch := copyMap(exp, act)
+
+	if mismatch > 0 {
+		t.Error("Expected", 0, "result", mismatch)
+	}
+
+}
