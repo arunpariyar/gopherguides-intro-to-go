@@ -11,7 +11,7 @@ func TestCopySlice(t *testing.T){
 	isSame := copySlice(exp, act)
 	
 	if isSame != true {
-		t.Error("Expected", true, "result", isSame)
+		t.Error("Length of slices is different: Expected", true, "result", isSame)
 	}
 }
 
@@ -23,7 +23,7 @@ func TestCopyArray(t *testing.T){
 
 	mismatch := copyArray(exp, act)
 		if mismatch > 0 {
-			t.Error("Expected", 0, "result", mismatch)
+			t.Error("Content mismatch found : Expected", 0, "Mismatch", mismatch)
 		}
 }
 
@@ -43,7 +43,7 @@ func TestCopyMap(t *testing.T){
 	mismatch := copyMap(exp, act)
 
 	if mismatch > 0 {
-		t.Error("Expected", 0, "result", mismatch)
+		t.Error("Content mismatch found : Expected", 0, "Mismatch", mismatch)
 	}
 
 }

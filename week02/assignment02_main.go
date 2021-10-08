@@ -59,9 +59,12 @@ func copyMap(main map[string]string, dup map[string]string) int {
 
 	//to create error
 	keys = append(keys, "error")
+	//loop through the keys 
 	for _, k := range keys {
+		//checking if the keys exist in dup
 		_, ok := dup[k]
 		if !ok {
+			//incrementing mismatch to keep track of mismatches
 			mismatch++
 		}
 	}
