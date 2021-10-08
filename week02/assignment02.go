@@ -6,33 +6,33 @@ func main() {
 
 func copyArray(main [7]string, dup [7]string) int {
 	//variable to keep track of unmatched content
-	noOfunmatchContents := 0
+	noOfMismatch := 0
 
-	//looping through exp
+	//looping through main
 	for i, v := range main {
 		//copying values to array act in the corresponding index
 		dup[i] = v
+		
 		//TO CREATE ERROR
 		// dup[i] = v + "error"
 	}
 
-	//loop through act
+	//loop through main
 	for i := range main {
 		if main[i] != dup[i] {
 			//incrementing when mismatch is found
-			noOfunmatchContents++
+			noOfMismatch++
 		}
 	}
-	return noOfunmatchContents
+	return noOfMismatch
 }
 
 func copySlice(main []string, dup []string) bool {
-	//looping through exp
-	for _, v := range main {
-		//using append to push the values to act
-		dup = append(dup, v)
+	
+	//using append while unpacking the main slice using the .... notation
+	dup = append(dup, main...)
 
-	}
+	
 	//TO CREATE ERROR
 	//adding one more value to the slice manually
 	// dup = append(dup, "ERROR")
@@ -57,9 +57,10 @@ func copyMap(main map[string]string, dup map[string]string) int {
 		keys = append(keys, k)
 	}
 
-	//to create error
-	keys = append(keys, "error")
-	//loop through the keys 
+	//TO CREATE ERROR
+	// keys = append(keys, "error")
+
+	//loop through the keys
 	for _, k := range keys {
 		//checking if the keys exist in dup
 		_, ok := dup[k]
@@ -70,5 +71,4 @@ func copyMap(main map[string]string, dup map[string]string) int {
 	}
 
 	return mismatch
-
 }
