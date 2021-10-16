@@ -142,7 +142,6 @@ func Test_TPlay(t *testing.T) {
 		plays:   3,
 		viewers: 300,
 		critics: []float32{9, 9, 9, 8.5},
-		
 	}
 
 	m3 := &Movie{
@@ -169,14 +168,14 @@ func Test_TPlay(t *testing.T) {
 
 	mlist := []*Movie{m1, m2, m3, m4}
 
-	err := t1.TPlay(100, mlist...)
+	err := t1.Play(100, mlist...)
 	if err != nil {
 		t.Error(err)
 	}
 
 }
 
-func Test_Critique(t *testing.T){
+func Test_Critique(t *testing.T) {
 	m1 := &Movie{
 		Name:    "Avatar",
 		Length:  16,
@@ -214,36 +213,36 @@ func Test_Critique(t *testing.T){
 	}
 
 	t1 := Theatre{
-		name : "The Wall",
+		name: "The Wall",
 	}
 
-	mlist := []*Movie{m1,m2,m3,m4}
+	mlist := []*Movie{m1, m2, m3, m4}
 
-	err :=  t1.Critique(mlist, Critic)
+	err := t1.Critique(mlist, Critic)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func Test_Critic(t *testing.T){
+func Test_Critic(t *testing.T) {
 	m4 := &Movie{
-			Name:    "Star Wars: The Force Awakens",
-			Length:  135,
-			rating:  0,
-			plays:   2,
-			viewers: 200,
-			critics: []float32{7, 7, 7, 6.5},
-		}	
-	
+		Name:    "Star Wars: The Force Awakens",
+		Length:  135,
+		rating:  0,
+		plays:   2,
+		viewers: 200,
+		critics: []float32{7, 7, 7, 6.5},
+	}
+
 	rating := float32(68.75) // hard calculated
 
 	result, err := Critic(m4)
-		if err != nil {
-			t.Error(err)
-		}
-	
+	if err != nil {
+		t.Error(err)
+	}
+
 	if result != rating {
 		t.Errorf("Expected %f got %f \n", rating, result)
 	}
-	
+
 }

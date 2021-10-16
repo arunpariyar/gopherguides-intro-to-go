@@ -14,7 +14,7 @@ type Movie struct {
 }
 
 type Theatre struct {
-	name  string
+	name string
 }
 
 type Critiquefn func(*Movie) (float32, error)
@@ -53,7 +53,7 @@ func (m Movie) String() string {
 }
 
 func (t *Theatre) Play(viewers int, movies ...*Movie) error {
-	if(viewers) == 0 {
+	if (viewers) == 0 {
 		return fmt.Errorf("viewers cant be zero")
 	}
 	if len(movies) == 0 {
@@ -76,7 +76,7 @@ func (t Theatre) Critique(m []*Movie, cfn Critiquefn) error {
 		if err != nil {
 			return err
 		}
-	
+
 		err = m.Rate(rating)
 
 		if err != nil {
