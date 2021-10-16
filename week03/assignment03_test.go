@@ -15,7 +15,7 @@ func Test_Rate(t *testing.T) {
 		viewers: 400,
 	}
 
-	err := m.Rate(float32(m.rating))
+	err := m.Rate(m.rating)
 	if err != nil {
 		t.Error(err)
 	}
