@@ -91,7 +91,7 @@ func Critic(m *Movie) (float32, error) {
 		return 0, fmt.Errorf("this is the films first critique play value expected more than 1 got %d", m.plays)
 	}
 
-	rating := float32(0)
+	var rating float32
 
 	for _, v := range m.critics {
 		rating += v
