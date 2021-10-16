@@ -52,7 +52,7 @@ func (m Movie) String() string {
 	return fmt.Sprintf("%s (%dm) %.1f%%", m.Name, m.Length, m.rating)
 }
 
-func (t *Theatre) TPlay(viewers int, movies ...*Movie) error {
+func (t *Theatre) Play(viewers int, movies ...*Movie) error {
 	if(viewers) == 0 {
 		return fmt.Errorf("viewers cant be zero")
 	}
