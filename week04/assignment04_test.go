@@ -23,7 +23,7 @@ func Test_Entertain1(t *testing.T) {
 
 	err := v.Entertain(2, b)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	exp := fmt.Sprintf("Guns and Roses has performed for %d people.\nGuns and Roses has completed teardown.\n", v.Audience)
