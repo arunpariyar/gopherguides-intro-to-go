@@ -28,8 +28,9 @@ func Test_Entertain1(t *testing.T) {
 
 	exp := fmt.Sprintf("Guns and Roses has performed for %d people.\nGuns and Roses has completed teardown.\n", v.Audience)
 
-	if res.String() != exp {
-		t.Error("logs don't match")
+	act := res.String()
+	if act != exp {
+		t.Fatalf("expected %s, got %s", exp, act)
 	}
 }
 
