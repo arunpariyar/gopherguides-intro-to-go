@@ -46,7 +46,7 @@ func (v *Venue) Entertain(aud int, artists ...Entertainer) error {
 		if err := artist.Perform(*v); err != nil {
 			return err
 		}
-
+ 
 		if td, ok := artist.(Teardowner); ok {
 			if err := td.Teardown(*v); err != nil {
 				return err
