@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_String(t *testing.T) {
+func Test_clause_String(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -13,17 +13,17 @@ func Test_String(t *testing.T) {
 		exp  string
 	}{
 		{
-			name: "entries with uppercase",
+			name: "matching clauses",
 			cls:  Clauses{"name": "Sir Canon Doyle", "job": "Investigator"},
 			exp:  `"job" = "Investigator" and "name" = "Sir Canon Doyle"`},
 		{
-			name: "entries with lowercase",
+			name: "unmatching clauses",
 			cls:  Clauses{"spiderman": "peter parker", "batman": "bruce wayne"},
 			exp:  `"batman" = "bruce wayne" and "spiderman" = "peter parker"`},
 		{
 			name: "empty clauses",
 			cls:  Clauses{},
-			exp:  ""},
+			exp:  ``},
 	}
 
 	for _, tt := range table {
@@ -37,7 +37,7 @@ func Test_String(t *testing.T) {
 	}
 }
 
-func Test_Match(t *testing.T) {
+func Test_clause_Match(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -60,7 +60,8 @@ func Test_Match(t *testing.T) {
 			name: "empty case",
 			cls:  Clauses{},
 			mdl:  Model{},
-			exp:  true},
+			exp:  true,
+		},
 	}
 
 	for _, tt := range table {

@@ -20,7 +20,6 @@ func (s *Store) db() data {
 
 func (s *Store) All(tn string) (Models, error) {
 	db := s.db()
-
 	mods, ok := db[tn]
 	if !ok {
 		return nil, &ErrTableNotFound{table: tn}

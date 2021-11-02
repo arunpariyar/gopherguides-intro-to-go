@@ -12,12 +12,14 @@ func Test_store_db(t *testing.T) {
 		data: nil,
 	}
 
-	if len(s.data) != 0 {
-		t.Fatalf("expected 0 got %v", len(s.data))
+	db := s.db()
+
+	if len(db) != 0 {
+		t.Fatalf("expected 0 got %v", len(db))
 	}
 }
 
-func Test_Store_All(t *testing.T) {
+func Test_store_All(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -25,7 +27,6 @@ func Test_Store_All(t *testing.T) {
 		store *Store
 		tn    string
 		mods  Models
-		exp   error
 	}{
 		{name: "store with orders",
 			store: &Store{
@@ -65,18 +66,14 @@ func Test_Store_All(t *testing.T) {
 				if ok := IsErrTableNotFound(err); !ok {
 					t.Fatalf("%s expected error type %s got %T", tt.name, "ErrTableNotFound", err)
 				}
-
-				if err.Error() != tt.exp.Error() {
-					t.Fatalf("%s expected %q got %q", tt.name, tt.exp.Error(), err.Error())
-				}
 			}
 
-			assertSameModel(t, mods, tt.mods)
+			assertSameModels(t, mods, tt.mods)
 		})
 	}
 }
 
-func Test_Store_Len(t *testing.T) {
+func Test_store_Len(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -91,9 +88,6 @@ func Test_Store_Len(t *testing.T) {
 			store: &Store{},
 			tn:    "users",
 			len:   0,
-			exp: ErrTableNotFound{
-				table: "users",
-			},
 		},
 		{name: "store with orders",
 			store: &Store{
@@ -106,7 +100,7 @@ func Test_Store_Len(t *testing.T) {
 			},
 			tn:  "orders",
 			len: 2,
-			exp: nil},
+		},
 	}
 
 	for _, tt := range table {
@@ -115,10 +109,6 @@ func Test_Store_Len(t *testing.T) {
 			if err != nil {
 				if ok := IsErrTableNotFound(err); !ok {
 					t.Fatalf("%s expected error type %s got %T", tt.name, "ErrTableNotFound", err)
-				}
-
-				if err.Error() != tt.exp.Error() {
-					t.Fatalf("%s expected %q got %q", tt.name, tt.exp.Error(), err.Error())
 				}
 			}
 			if len != tt.len {
@@ -178,10 +168,10 @@ func Test_store_Insert(t *testing.T) {
 
 	for _, tt := range table {
 		t.Run(tt.name, func(t *testing.T) {
-			db := tt.store.db()
 			tt.store.Insert(tt.tn, tt.mlist...)
+			db := tt.store.db()
 			mods := db[tt.tn]
-			assertSameModel(t, mods, tt.mods)
+			assertSameModels(t, mods, tt.mods)
 
 		})
 	}
@@ -195,7 +185,6 @@ func Test_store_Select(t *testing.T) {
 		tn   string
 		cls  Clauses
 		mods Models
-		len  int
 		exp  error
 	}{
 		{
@@ -213,7 +202,6 @@ func Test_store_Select(t *testing.T) {
 			tn:   "orders",
 			cls:  Clauses{"gps": "garmin"},
 			mods: []Model{{"gps": "garmin"}},
-			len:  1,
 			exp:  nil},
 		{
 			name: "store with table but no model",
@@ -225,7 +213,6 @@ func Test_store_Select(t *testing.T) {
 			tn:   "orders",
 			cls:  Clauses{"gps": "garmin"},
 			mods: []Model{},
-			len:  1,
 			exp: &errNoRows{
 				clauses: Clauses{"gps": "garmin"},
 				table:   "orders",
@@ -243,7 +230,6 @@ func Test_store_Select(t *testing.T) {
 			tn:   "orders",
 			cls:  Clauses{},
 			mods: []Model{{"smartwatch": "xioami"}},
-			len:  0,
 			exp: &errNoRows{
 				clauses: Clauses{},
 				table:   "orders",
@@ -260,7 +246,6 @@ func Test_store_Select(t *testing.T) {
 			tn:   "",
 			cls:  Clauses{},
 			mods: []Model{{"smartwatch": "xioami"}},
-			len:  0,
 			exp: ErrTableNotFound{
 				table: "",
 			}},
@@ -275,23 +260,13 @@ func Test_store_Select(t *testing.T) {
 				}
 			}
 
-			if len(tt.cls) != tt.len {
-				t.Fatalf("length of clause %d need at least 1", len(tt.cls))
-			}
-
-			if len(mods) == 0 {
-				if err.Error() != tt.exp.Error() {
-					t.Fatalf("%s expected %q got %q", tt.name, tt.exp.Error(), err.Error())
-				}
-			}
-
-			assertSameModel(t, mods, tt.mods)
+			assertSameModels(t, mods, tt.mods)
 
 		})
 	}
 }
 
-func assertSameModel(t testing.TB, act Models, exp Models) {
+func assertSameModels(t testing.TB, act Models, exp Models) {
 	t.Helper()
 
 	k1 := []string{}

@@ -4,13 +4,13 @@ import (
 	"testing"
 )
 
-func Test_error_Error(t *testing.T) {
+func Test_errors_Error(t *testing.T) {
 	t.Parallel()
 	e := ErrTableNotFound{
 		table: "test",
 	}
 
-	exp := "table not found test"
+	exp := `table not found test`
 
 	if ok := IsErrTableNotFound(e); ok {
 
@@ -22,7 +22,7 @@ func Test_error_Error(t *testing.T) {
 	}
 }
 
-func Test_error_Table_Not_Found(t *testing.T) {
+func Test_errors_Table_Not_Found(t *testing.T) {
 	t.Parallel()
 	e := ErrTableNotFound{
 		table: "test",
@@ -40,7 +40,7 @@ func Test_error_Table_Not_Found(t *testing.T) {
 	}
 }
 
-func Test_error_ErrTableNotFound_Is(t *testing.T) {
+func Test_errors_ErrTableNotFound_Is(t *testing.T) {
 	t.Parallel()
 	e := ErrTableNotFound{
 		table: "test",
@@ -53,7 +53,7 @@ func Test_error_ErrTableNotFound_Is(t *testing.T) {
 	}
 }
 
-func Test_Clauses(t *testing.T) {
+func Test_errors_Clauses(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -86,16 +86,16 @@ func Test_Clauses(t *testing.T) {
 
 	for _, tt := range table {
 		t.Run(tt.name, func(t *testing.T) {
-			res := tt.e.Clauses()
+			act := tt.e.Clauses()
 
-			if res.String() != tt.exp.String() {
-				t.Fatalf("%s expected %#v got %#v ", tt.name, tt.exp.String(), res.String())
+			if act.String() != tt.exp.String() {
+				t.Fatalf("%s expected %#v got %#v ", tt.name, tt.exp.String(), act.String())
 			}
 		})
 	}
 }
 
-func Test_RowNotFound(t *testing.T) {
+func Test_errors_RowNotFound(t *testing.T) {
 	t.Parallel()
 
 	cls1 := Clauses{"gps": "garmin"}
@@ -117,7 +117,7 @@ func Test_RowNotFound(t *testing.T) {
 	}
 }
 
-func Test_errors_Is(t *testing.T) {
+func Test_errors_errNoRows_Is(t *testing.T) {
 	t.Parallel()
 	cls1 := Clauses{"gps": "garmin"}
 	tn1 := "orders"
@@ -126,10 +126,9 @@ func Test_errors_Is(t *testing.T) {
 		clauses: cls1,
 		table:   tn1,
 	}
-
 	exp := true
 
-	act := e.Is(&e)
+	act := e.Is(&errNoRows{})
 	if act != exp {
 		t.Fatalf("expected %t got %t", exp, act)
 	}
