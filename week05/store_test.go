@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test_store_db(t *testing.T) {
+func Test_Store_db(t *testing.T) {
 	t.Parallel()
 	s := &Store{
 		data: nil,
