@@ -31,7 +31,7 @@ func Test_clause_String(t *testing.T) {
 			act := tt.cls.String()
 
 			if act != tt.exp {
-				t.Fatalf("%s expected %q and %q", tt.name, tt.exp, act)
+				t.Fatalf("expected %q, got %q", tt.exp, act)
 			}
 		})
 	}
