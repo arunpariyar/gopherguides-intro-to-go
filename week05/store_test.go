@@ -266,39 +266,17 @@ func Test_store_Select(t *testing.T) {
 	}
 }
 
-func assertSameModels(t testing.TB, act Models, exp Models) {
+func assertModels(t testing.TB, exp Models, act Models) {
 	t.Helper()
 
-	k1 := []string{}
-	v1 := []string{}
-
-	k2 := []string{}
-	v2 := []string{}
-
-	for _, m := range act {
-		for k, v := range m {
-			k1 = append(k1, k)
-			vc1 := fmt.Sprintf("%s", v)
-			v1 = append(v1, vc1)
-		}
+	if len(exp) != len(act) {
+		t.Fatalf("expected %d models, got %d", len(exp), len(act))
 	}
 
-	for _, m := range exp {
-		for k, v := range m {
-			k2 = append(k2, k)
-			vc2 := fmt.Sprintf("%s", v)
-			v2 = append(v2, vc2)
-		}
-	}
+	exps := fmt.Sprintf("%#v", exp)
+	acts := fmt.Sprintf("%#v", act)
 
-	sort.Strings(k1)
-	sort.Strings(k2)
-	sort.Strings(v1)
-	sort.Strings(v2)
-
-	for i := 0; i < len(k1); i++ {
-		if k1[i] != k2[i] || v1[i] != v2[i] {
-			t.Fatal("models don't match")
-		}
+	if acts != exps {
+		t.Fatalf("expected %s, got %s", exps, acts)
 	}
 }
