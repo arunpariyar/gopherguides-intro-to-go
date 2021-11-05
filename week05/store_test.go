@@ -19,7 +19,7 @@ func Test_Store_db(t *testing.T) {
 	}
 }
 
-func Test_store_All(t *testing.T) {
+func Test_Store_All(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
