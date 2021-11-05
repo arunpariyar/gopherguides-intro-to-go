@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_clause_String(t *testing.T) {
+func Test_Clause_String(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -37,7 +37,7 @@ func Test_clause_String(t *testing.T) {
 	}
 }
 
-func Test_clause_Match(t *testing.T) {
+func Test_Clause_Match(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -70,7 +70,7 @@ func Test_clause_Match(t *testing.T) {
 			res := tt.cls.Match(tt.mdl)
 
 			if res != tt.exp {
-				t.Fatalf("%s expected %t got %t", tt.name, tt.exp, res)
+				t.Fatalf("expected %t got %t", tt.exp, res)
 			}
 		})
 	}

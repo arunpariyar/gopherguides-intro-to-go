@@ -2,7 +2,6 @@ package demo
 
 import (
 	"fmt"
-	"sort"
 	"testing"
 )
 
@@ -64,16 +63,16 @@ func Test_Store_All(t *testing.T) {
 
 			if err != nil {
 				if ok := IsErrTableNotFound(err); !ok {
-					t.Fatalf("%s expected error type %s got %T", tt.name, "ErrTableNotFound", err)
+					t.Fatalf("expected error type %s got %T", "ErrTableNotFound", err)
 				}
 			}
 
-			assertSameModels(t, mods, tt.mods)
+			assertModels(t, mods, tt.mods)
 		})
 	}
 }
 
-func Test_store_Len(t *testing.T) {
+func Test_Store_Len(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -108,17 +107,17 @@ func Test_store_Len(t *testing.T) {
 			len, err := tt.store.Len(tt.tn)
 			if err != nil {
 				if ok := IsErrTableNotFound(err); !ok {
-					t.Fatalf("%s expected error type %s got %T", tt.name, "ErrTableNotFound", err)
+					t.Fatalf(" expected error type %s got %T", "ErrTableNotFound", err)
 				}
 			}
 			if len != tt.len {
-				t.Fatalf("%s expected length %q got %q", tt.name, tt.len, len)
+				t.Fatalf("expected length %q got %q", tt.len, len)
 			}
 		})
 	}
 }
 
-func Test_store_Insert(t *testing.T) {
+func Test_Store_Insert(t *testing.T) {
 	t.Parallel()
 
 	table := []struct {
@@ -171,13 +170,13 @@ func Test_store_Insert(t *testing.T) {
 			tt.store.Insert(tt.tn, tt.mlist...)
 			db := tt.store.db()
 			mods := db[tt.tn]
-			assertSameModels(t, mods, tt.mods)
+			assertModels(t, mods, tt.mods)
 
 		})
 	}
 }
 
-func Test_store_Select(t *testing.T) {
+func Test_Store_Select(t *testing.T) {
 	t.Parallel()
 	table := []struct {
 		name string
@@ -212,7 +211,7 @@ func Test_store_Select(t *testing.T) {
 			},
 			tn:   "orders",
 			cls:  Clauses{"gps": "garmin"},
-			mods: []Model{},
+			mods: nil,
 			exp: &errNoRows{
 				clauses: Clauses{"gps": "garmin"},
 				table:   "orders",
@@ -245,7 +244,7 @@ func Test_store_Select(t *testing.T) {
 			},
 			tn:   "",
 			cls:  Clauses{},
-			mods: []Model{{"smartwatch": "xioami"}},
+			mods: nil,
 			exp: ErrTableNotFound{
 				table: "",
 			}},
@@ -256,11 +255,11 @@ func Test_store_Select(t *testing.T) {
 			mods, err := tt.str.Select(tt.tn, tt.cls)
 			if err != nil {
 				if err.Error() != tt.exp.Error() {
-					t.Fatalf("%s expected %q got %q", tt.name, tt.exp.Error(), err.Error())
+					t.Fatalf("expected %q got %q", tt.exp.Error(), err.Error())
 				}
 			}
 
-			assertSameModels(t, mods, tt.mods)
+			assertModels(t, mods, tt.mods)
 
 		})
 	}
