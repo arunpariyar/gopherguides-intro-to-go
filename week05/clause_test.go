@@ -50,7 +50,8 @@ func Test_clause_Match(t *testing.T) {
 			name: "true case",
 			cls:  Clauses{"name": "Sir Canon Doyle", "job": "Investigator"},
 			mdl:  Model{"name": "Sir Canon Doyle", "job": "Investigator"},
-			exp:  true},
+			exp:  true,
+		},
 		{
 			name: "false case",
 			cls:  Clauses{"spiderman": "peter parker", "batman": "bruce wayne"},
