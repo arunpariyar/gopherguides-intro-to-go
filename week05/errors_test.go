@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_errors_Error(t *testing.T) {
+func Test_IsErrTableNotFound(t *testing.T) {
 	t.Parallel()
 	e := ErrTableNotFound{
 		table: "test",
