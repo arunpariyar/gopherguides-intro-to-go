@@ -4,91 +4,159 @@ import (
 	"testing"
 )
 
-// ATTENTION: YOU ARE NOT ALLOWED TO SUBMIT THIS
-// TEST AS PART OF YOUR ASSIGNMENT!!
-//
-// This test is meant to demonstrate how to use the
-// application.
-//
-// YOU MUST DELETE THIS TEST !!BEFORE!! YOU SUBMIT!!
-func Test_Manager_Demonstration(t *testing.T) {
-	t.Parallel()
-
-	// ALWAYS use the NewManager function to
-	// create a new Manager. This ensures that
-	// the Manager is always in a consistent state.
-	// Failure to do so will result in a panic.
+func Test_Manager_Start_Fail(t *testing.T) {
 	m := NewManager()
+	exp := ErrInvalidEmployeeCount(0)
 
-	// start the manager with 5 employees
-	err := m.Start(5)
-	if err != nil {
-		t.Fatal(err)
+	act := m.Start(0)
+
+	if act.Error() != exp.Error() {
+		t.Fatalf("expected %q got %q", exp.Error(), act.Error())
 	}
+}
 
-	// buildCount is the amount of products we
-	// want to build
-	buildCount := 5
+func Test_Manager_Start_Success(t *testing.T) {
+	m := NewManager()
+	exp := 10
 
-	// launch buildCount number of goroutines
-	// each goroutine will push a new product
-	// into the system.
-	for i := 0; i < buildCount; i++ {
+	err := m.Start(3)
 
-		// for each new product we will launch
-		// a new goroutine to push it into the
-		// system.
+	if err == nil {
 		go func() {
+			m.Assign(&Product{Quantity: 10})
+		}()
+		act := <-m.completed
 
-			// push a new product, with a quantity of 2,
-			// in the system.
-			// this will block until the manager is able to
-			// to assign the product to an employee.
-			err := m.Assign(&Product{Quantity: 2})
-			if err != nil {
-				m.Errors() <- err
-			}
+		if act.Product.Quantity != 10 {
+			t.Fatalf("expected %q got %q", act.Product.Quantity, exp)
+		}
+	}
+}
 
-		}() // go
+func Test_Manager_Assign_Stopped(t *testing.T) {
+	m := NewManager()
+	exp := ErrManagerStopped{}
 
-	} // for
+	//stopping the manager
+	m.Stop()
 
-	// actual completed products we receive.
-	var act []CompletedProduct
+	act := m.Assign(&Product{})
 
-	// launch a goroutine that will receive the completed
-	// products and add them to the act slice.
+	if act.Error() != exp.Error() {
+		t.Fatalf("expected %q got %q", exp.Error(), act.Error())
+	}
+}
+
+func Test_Manager_Assign_Success(t *testing.T) {
+	m := NewManager()
+	p1 := &Product{Quantity: 1}
+	p2 := &Product{Quantity: 2}
+	p3 := &Product{Quantity: 3}
+
+	exp := 6
+	act := 0
+
 	go func() {
+		m.Assign(p1, p2, p3)
+		close(m.jobs)
+	}()
+	//aggregating the total product quantity to compare with total products quatity "exp"
+	for v := range m.jobs {
+		act += v.Quantity
+	}
+	if act != exp {
+		t.Fatalf("expected %v got %v", exp, act)
+	}
+}
 
-		// keep receiving completed products until
-		// the completed channel is closed.
-		for cp := range m.Completed() {
-
-			// add the completed product to the act slice
-			act = append(act, cp)
-
-			// if we have received all the products we
-			// want to receive, we can stop the manager.
-			if len(act) == buildCount {
-				m.Stop()
-			}
-
-		} // for
-
-	}() // go
-
-	select {
-	case err := <-m.Errors():
-		// if the manager received an error, we will
-		// mark the test as failed.
-		t.Fatal(err)
-	case <-m.Done():
-		// the manager has been stopped, we can
-		// continue and check the results.
+func Test_Manager_Complete_Success(t *testing.T) {
+	m := NewManager()
+	e := Employee(5)
+	p := &Product{
+		Quantity: 10,
+		builtBy:  e,
+	}
+	exp := CompletedProduct{
+		Product: Product{
+			Quantity: 10,
+			builtBy:  e,
+		},
+		Employee: e,
 	}
 
-	if len(act) != buildCount {
-		t.Fatalf("expected %d, got %d", buildCount, len(act))
+	go func() {
+		m.Complete(e, p)
+		m.Stop()
+	}()
+
+	act := <-m.completed
+	if act != exp {
+		t.Fatalf("expected %q got %q", exp, act)
+	}
+}
+
+func Test_Manager_Complete_Fail_ErrInvalidEmployee(t *testing.T) {
+	m := NewManager()
+	e := Employee(0)
+	p := &Product{
+		Quantity: 10,
+	}
+	exp := ErrInvalidEmployee(0)
+
+	err := m.Complete(e, p)
+	if err.Error() != exp.Error() {
+		t.Fatalf("expected %v got %v", exp.Error(), err.Error())
+	}
+}
+
+func Test_Manager_Complete_Fail_ErrProductNotBuilt(t *testing.T) {
+	m := NewManager()
+	e := Employee(1)
+	p := &Product{
+		Quantity: 10,
+	}
+	exp := ErrProductNotBuilt("product is not built: {10 0}")
+
+	err := m.Complete(e, p)
+	if err.Error() != exp.Error() {
+		t.Fatalf("expected %v got %v", exp.Error(), err.Error())
+	}
+}
+
+func Test_Manager_Completed(t *testing.T) {
+	m := NewManager()
+	e := Employee(3)
+	exp := CompletedProduct{
+		Product: Product{
+			Quantity: 10,
+			builtBy:  e,
+		},
+		Employee: e,
+	}
+
+	go e.work(m)
+
+	go func() {
+		m.Assign(&Product{Quantity: 10})
+	}()
+
+	act := <-m.completedCh()
+
+	if act != exp {
+		t.Fatalf("expected %q got %q", exp, act)
+	}
+}
+
+func Test_Manager_Done(t *testing.T) {
+	m := NewManager()
+	exp := true
+
+	m.Stop()
+
+	act := m.stopped
+
+	if act != exp {
+		t.Fatalf("expected %t got %t", exp, act)
 	}
 
 }
