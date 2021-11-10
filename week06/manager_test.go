@@ -6,6 +6,7 @@ import (
 
 func Test_Manager_Start_Fail(t *testing.T) {
 	m := NewManager()
+	defer m.Stop()
 	exp := ErrInvalidEmployeeCount(0)
 
 	act := m.Start(0)
@@ -97,36 +98,50 @@ func Test_Manager_Complete_Success(t *testing.T) {
 	}
 }
 
-func Test_Manager_Complete_Fail_ErrInvalidEmployee(t *testing.T) {
-	m := NewManager()
-	e := Employee(0)
-	p := &Product{
-		Quantity: 10,
-	}
-	exp := ErrInvalidEmployee(0)
+func Test_Manager_Complete_Fail(t *testing.T) {
+	t.Parallel()
 
-	err := m.Complete(e, p)
-	if err.Error() != exp.Error() {
-		t.Fatalf("expected %v got %v", exp.Error(), err.Error())
+	table := []struct {
+		name string
+		p    *Product
+		e    Employee
+		exp  error
+	}{
+		{
+			name: "Invalid Employee Error",
+			p: &Product{
+				Quantity: 10,
+			},
+			e:   Employee(0),
+			exp: ErrInvalidEmployee(0),
+		},
+		{
+			name: "Product not built error",
+			p: &Product{
+				Quantity: 10,
+			},
+			e: Employee(1),
+			exp: ErrProductNotBuilt("product is not built: {10 0}"),
+		},
 	}
-}
 
-func Test_Manager_Complete_Fail_ErrProductNotBuilt(t *testing.T) {
-	m := NewManager()
-	e := Employee(1)
-	p := &Product{
-		Quantity: 10,
-	}
-	exp := ErrProductNotBuilt("product is not built: {10 0}")
+	for _, tt := range table {
+		t.Run(tt.name, func(t *testing.T) {
+			m := NewManager()
+			defer m.Stop()
 
-	err := m.Complete(e, p)
-	if err.Error() != exp.Error() {
-		t.Fatalf("expected %v got %v", exp.Error(), err.Error())
+			act := m.Complete(tt.e, tt.p)
+			if act.Error() != tt.exp.Error() {
+				t.Fatalf("expected %v got %v", tt.exp.Error(), act.Error())
+			}
+
+		})
 	}
 }
 
 func Test_Manager_Completed(t *testing.T) {
 	m := NewManager()
+	defer m.Stop()
 	e := Employee(3)
 	exp := CompletedProduct{
 		Product: Product{
@@ -151,6 +166,7 @@ func Test_Manager_Completed(t *testing.T) {
 
 func Test_Manager_Done(t *testing.T) {
 	m := NewManager()
+	defer m.Stop()
 	exp := true
 
 	m.Stop()
