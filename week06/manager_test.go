@@ -17,6 +17,7 @@ func Test_Manager_Start_Fail(t *testing.T) {
 
 func Test_Manager_Start_Success(t *testing.T) {
 	m := NewManager()
+	defer m.Stop()
 	exp := 10
 
 	err := m.Start(3)
