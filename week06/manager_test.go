@@ -72,6 +72,7 @@ func Test_Manager_Assign_Success(t *testing.T) {
 
 func Test_Manager_Complete_Success(t *testing.T) {
 	m := NewManager()
+	defer m.Stop()
 	e := Employee(5)
 	p := &Product{
 		Quantity: 10,
