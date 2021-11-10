@@ -99,7 +99,7 @@ func Test_Manager_Complete_Success(t *testing.T) {
 }
 
 func Test_Manager_Complete_Fail(t *testing.T) {
-	t.Parallel()
+	
 
 	table := []struct {
 		name string
