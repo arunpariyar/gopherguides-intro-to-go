@@ -37,10 +37,12 @@ func Test_Manager_Start_Success(t *testing.T) {
 
 func Test_Manager_Assign_Stopped(t *testing.T) {
 	m := NewManager()
+	defer m.Stop()
+
 	exp := ErrManagerStopped{}
 
 	//stopping the manager
-	defer m.Stop()
+	m.Stop()
 
 	act := m.Assign(&Product{})
 
@@ -169,12 +171,11 @@ func Test_Manager_Done(t *testing.T) {
 	defer m.Stop()
 	exp := true
 
-	defer m.Stop()
 
+	m.Stop()
 	act := m.stopped
-
+	
 	if act != exp {
 		t.Fatalf("expected %t got %t", exp, act)
 	}
-
 }
