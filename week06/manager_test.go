@@ -53,6 +53,8 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 
 func Test_Manager_Assign_Success(t *testing.T) {
 	m := NewManager()
+	
+	
 	p1 := &Product{Quantity: 1}
 	p2 := &Product{Quantity: 2}
 	p3 := &Product{Quantity: 3}
@@ -76,6 +78,7 @@ func Test_Manager_Assign_Success(t *testing.T) {
 func Test_Manager_Complete_Success(t *testing.T) {
 	m := NewManager()
 	defer m.Stop()
+
 	e := Employee(5)
 	p := &Product{
 		Quantity: 10,
@@ -144,6 +147,7 @@ func Test_Manager_Complete_Fail(t *testing.T) {
 func Test_Manager_Completed(t *testing.T) {
 	m := NewManager()
 	defer m.Stop()
+
 	e := Employee(3)
 	exp := CompletedProduct{
 		Product: Product{
@@ -169,6 +173,7 @@ func Test_Manager_Completed(t *testing.T) {
 func Test_Manager_Done(t *testing.T) {
 	m := NewManager()
 	defer m.Stop()
+
 	exp := true
 
 
