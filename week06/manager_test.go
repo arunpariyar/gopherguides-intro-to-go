@@ -21,6 +21,7 @@ func Test_Manager_Start_Fail(t *testing.T) {
 func Test_Manager_Start_Success(t *testing.T) {
 	t.Parallel()
 	m := NewManager()
+	defer m.Stop()
 
 	exp := 10
 
@@ -41,7 +42,6 @@ func Test_Manager_Start_Success(t *testing.T) {
 func Test_Manager_Assign_Stopped(t *testing.T) {
 	t.Parallel()
 	m := NewManager()
-	
 
 	exp := ErrManagerStopped{}
 
@@ -58,6 +58,7 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 func Test_Manager_Assign_Success(t *testing.T) {
 	t.Parallel()
 	m := NewManager()
+	defer m.Stop()
 
 	p1 := &Product{Quantity: 1}
 	p2 := &Product{Quantity: 2}
@@ -129,7 +130,7 @@ func Test_Manager_Complete_Fail(t *testing.T) {
 			p: &Product{
 				Quantity: 10,
 			},
-			e: Employee(1),
+			e:   Employee(1),
 			exp: ErrProductNotBuilt("product is not built: {10 0}"),
 		},
 	}
@@ -150,9 +151,9 @@ func Test_Manager_Complete_Fail(t *testing.T) {
 
 func Test_Manager_Completed(t *testing.T) {
 	t.Parallel()
-	
-	m := NewManager()
 
+	m := NewManager()
+	defer m.Stop()
 
 	e := Employee(3)
 	exp := CompletedProduct{
@@ -179,13 +180,11 @@ func Test_Manager_Completed(t *testing.T) {
 func Test_Manager_Done(t *testing.T) {
 	m := NewManager()
 
-
 	exp := true
-
 
 	m.Stop()
 	act := m.stopped
-	
+
 	if act != exp {
 		t.Fatalf("expected %t got %t", exp, act)
 	}
