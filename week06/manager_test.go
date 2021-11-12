@@ -40,7 +40,7 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 	exp := ErrManagerStopped{}
 
 	//stopping the manager
-	m.Stop()
+	defer m.Stop()
 
 	act := m.Assign(&Product{})
 
@@ -169,7 +169,7 @@ func Test_Manager_Done(t *testing.T) {
 	defer m.Stop()
 	exp := true
 
-	m.Stop()
+	defer m.Stop()
 
 	act := m.stopped
 
