@@ -6,6 +6,7 @@ import (
 
 func Test_Manager_Start_Fail(t *testing.T) {
 	m := NewManager()
+	defer m.Stop()
 
 	exp := ErrInvalidEmployeeCount(0)
 
