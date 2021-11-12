@@ -5,6 +5,7 @@ import (
 )
 
 func Test_Manager_Start_Fail(t *testing.T) {
+	t.Parallel()
 	m := NewManager()
 	defer m.Stop()
 
@@ -18,6 +19,7 @@ func Test_Manager_Start_Fail(t *testing.T) {
 }
 
 func Test_Manager_Start_Success(t *testing.T) {
+	t.Parallel()
 	m := NewManager()
 
 	exp := 10
@@ -37,6 +39,7 @@ func Test_Manager_Start_Success(t *testing.T) {
 }
 
 func Test_Manager_Assign_Stopped(t *testing.T) {
+	t.Parallel()
 	m := NewManager()
 	
 
@@ -53,6 +56,7 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 }
 
 func Test_Manager_Assign_Success(t *testing.T) {
+	t.Parallel()
 	m := NewManager()
 
 	p1 := &Product{Quantity: 1}
@@ -76,6 +80,7 @@ func Test_Manager_Assign_Success(t *testing.T) {
 }
 
 func Test_Manager_Complete_Success(t *testing.T) {
+	t.Parallel()
 	m := NewManager()
 
 	e := Employee(5)
@@ -103,7 +108,7 @@ func Test_Manager_Complete_Success(t *testing.T) {
 }
 
 func Test_Manager_Complete_Fail(t *testing.T) {
-	
+	t.Parallel()
 
 	table := []struct {
 		name string
@@ -144,6 +149,8 @@ func Test_Manager_Complete_Fail(t *testing.T) {
 }
 
 func Test_Manager_Completed(t *testing.T) {
+	t.Parallel()
+	
 	m := NewManager()
 
 
