@@ -156,6 +156,31 @@ func Run(ctx context.Context, count int, products ...*Product) ([]CompletedProdu
 	// TODO: implement this function
 	// This function should run the manager with the given products
 	// and return the results.
+
+	//start a new manager
+	m := NewManager()
+
+	//start with the number of employees
+	err := m.Start(count)
+	if err != nil {
+		return nil, err
+	}
+	//assign products to distribute jobs
+	err = m.Assign(products...)
+	if err != nil {
+		return nil, err
+	}
+
+	var cp []CompletedProduct
+
+	go func() {	
+		for p := range m.Completed(){
+			cp = append(cp, p)
+		}
+	}()
+
+	
+
 	return nil, nil
 }
 
