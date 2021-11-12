@@ -58,7 +58,7 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 func Test_Manager_Assign_Success(t *testing.T) {
 	t.Parallel()
 	m := NewManager()
-	defer m.Stop()
+	
 
 	p1 := &Product{Quantity: 1}
 	p2 := &Product{Quantity: 2}
