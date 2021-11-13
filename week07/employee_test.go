@@ -1,6 +1,7 @@
 package week06
 
 import (
+	"context"
 	"testing"
 )
 
@@ -45,10 +46,13 @@ func Test_Employee_Work_Error(t *testing.T) {
 	t.Parallel()
 
 	m := NewManager()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	e := Employee(0)
 	exp := ErrInvalidEmployee(0)
 
-	go e.work(m)
+	go e.work(ctx, m)
 
 	go func() {
 		m.Assign(&Product{Quantity: 1})
@@ -64,6 +68,9 @@ func Test_Employee_Work_Error(t *testing.T) {
 func Test_Employee_Work_Success(t *testing.T) {
 	t.Parallel()
 	m := NewManager()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	e := Employee(5)
 	exp := CompletedProduct{
 		Product: Product{
@@ -72,7 +79,7 @@ func Test_Employee_Work_Success(t *testing.T) {
 		},
 		Employee: 5}
 
-	go e.work(m)
+	go e.work(ctx, m)
 
 	go func() {
 		m.Assign(&Product{Quantity: 10})

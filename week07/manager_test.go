@@ -1,6 +1,8 @@
 package week06
 
 import (
+	"context"
+	"fmt"
 	"testing"
 )
 
@@ -9,9 +11,12 @@ func Test_Manager_Start_Fail(t *testing.T) {
 	m := NewManager()
 	defer m.Stop()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	exp := ErrInvalidEmployeeCount(0)
 
-	act := m.Start(0)
+	act := m.Start(ctx, 0)
 
 	if act.Error() != exp.Error() {
 		t.Fatalf("expected %q got %q", exp.Error(), act.Error())
@@ -23,9 +28,12 @@ func Test_Manager_Start_Success(t *testing.T) {
 	m := NewManager()
 	defer m.Stop()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	exp := 10
 
-	err := m.Start(3)
+	err := m.Start(ctx, 3)
 
 	if err == nil {
 		go func() {
@@ -42,7 +50,7 @@ func Test_Manager_Start_Success(t *testing.T) {
 func Test_Manager_Assign_Stopped(t *testing.T) {
 	t.Parallel()
 	m := NewManager()
-
+	defer m.Stop()
 	exp := ErrManagerStopped{}
 
 	//stopping the manager
@@ -58,7 +66,6 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 func Test_Manager_Assign_Success(t *testing.T) {
 	t.Parallel()
 	m := NewManager()
-	
 
 	p1 := &Product{Quantity: 1}
 	p2 := &Product{Quantity: 2}
@@ -155,6 +162,9 @@ func Test_Manager_Completed(t *testing.T) {
 	m := NewManager()
 	defer m.Stop()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	e := Employee(3)
 	exp := CompletedProduct{
 		Product: Product{
@@ -164,7 +174,7 @@ func Test_Manager_Completed(t *testing.T) {
 		Employee: e,
 	}
 
-	go e.work(m)
+	go e.work(ctx, m)
 
 	go func() {
 		m.Assign(&Product{Quantity: 10})
@@ -188,4 +198,15 @@ func Test_Manager_Done(t *testing.T) {
 	if act != exp {
 		t.Fatalf("expected %t got %t", exp, act)
 	}
+}
+
+func Test_Run(t *testing.T) {
+	ctx := context.Background()
+
+	p1 := &Product{Quantity: 1}
+	p2 := &Product{Quantity: 2}
+
+	cp, err := Run(ctx, 2,2, p1, p2)
+
+	fmt.Println(cp, err)
 }

@@ -1,5 +1,7 @@
 package week06
 
+import "context"
+
 // Employee is a worker.
 type Employee int
 
@@ -19,7 +21,7 @@ func (e Employee) IsValid() error {
 
 // worker listens for work from the manager
 // and tries to complete it.
-func (e Employee) work(m *Manager) {
+func (e Employee) work(ctx context.Context, m *Manager) {
 
 	// Use an infinite loop so we can listen for the next
 	// message coming down a channel.
@@ -30,6 +32,8 @@ func (e Employee) work(m *Manager) {
 
 		// listen for messages on different channels
 		select {
+		case <-ctx.Done():
+			m.Stop()
 		case <-m.Done(): // listen for the manager to signal that it is done
 			return
 		case p, ok := <-m.Jobs(): // listen for a new job

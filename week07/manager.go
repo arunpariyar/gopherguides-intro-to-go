@@ -1,5 +1,10 @@
 package week06
 
+import (
+	"context"
+	"fmt"
+)
+
 // Manager is responsible for receiving product orders
 // and assigning them to employees. Manager is also responsible
 // for receiving completed products, and listening for errors,
@@ -31,16 +36,21 @@ func NewManager() *Manager {
 // and start listening for jobs and errors.
 // Managers should be stopped using the Stop method
 // when they are no longer needed.
-func (m *Manager) Start(count int) error {
+func (m *Manager) Start(ctx context.Context, count int) error {
 
 	if count <= 0 {
 		return ErrInvalidEmployeeCount(count)
 	}
 
+	go func() {
+		<-ctx.Done()
+		m.Stop()
+	}()
+
 	for i := 0; i < count; i++ {
 
 		e := Employee(i + 1)
-		go e.work(m)
+		go e.work(ctx, m)
 	}
 
 	return nil
@@ -143,4 +153,54 @@ func (m *Manager) Stop() {
 	close(m.jobs)
 	close(m.errs)
 	close(m.completed)
+}
+
+func Run(ctx context.Context, emp int,  count int, products ...*Product) ([]CompletedProduct, error) {
+
+	// TODO: implement this function
+	// This function should run the manager with the given products
+	// and return the results.
+	
+	//start a new manager
+	m := NewManager()
+	defer m.Stop()
+
+	//start with the number of employees
+	err := m.Start(ctx, emp)
+	if err != nil {
+		m.errs <- err
+	}
+
+	//assign products to distribute jobs
+	go func() {
+		err = m.Assign(products...)
+		if err != nil {
+			m.Errors() <- err
+		}
+	}()
+	//storage for all completed product
+	var cp []CompletedProduct
+
+	go func() {
+		for p := range m.Completed() {
+			cp = append(cp, p)
+
+			if len(cp) == count {
+					m.Stop()
+			}
+		}
+	
+	}()
+
+	select {
+	case <-ctx.Done():
+		fmt.Println("Context Done")
+		m.Stop()
+	case e := <-m.Errors():
+		return nil, e
+	case <-m.Done():
+
+	}
+
+	return cp, nil
 }
