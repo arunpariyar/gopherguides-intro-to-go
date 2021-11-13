@@ -1,9 +1,4 @@
-package week07
-
-import (
-	"context"
-	"fmt"
-)
+package week06
 
 // Manager is responsible for receiving product orders
 // and assigning them to employees. Manager is also responsible
@@ -18,7 +13,6 @@ type Manager struct {
 	jobs      chan *Product
 	quit      chan struct{}
 	stopped   bool
-	// cancel 	  context.CancelFunc
 }
 
 // NewManager will create a new Manager.
@@ -37,17 +31,11 @@ func NewManager() *Manager {
 // and start listening for jobs and errors.
 // Managers should be stopped using the Stop method
 // when they are no longer needed.
-func (m *Manager) Start(ctx context.Context, count int) error {
+func (m *Manager) Start(count int) error {
 
 	if count <= 0 {
 		return ErrInvalidEmployeeCount(count)
 	}
-
-	go func() {
-		<-ctx.Done()
-		fmt.Println("context Done")
-		m.Stop()
-	}()
 
 	for i := 0; i < count; i++ {
 
@@ -154,42 +142,5 @@ func (m *Manager) Stop() {
 	close(m.quit)
 	close(m.jobs)
 	close(m.errs)
+	close(m.completed)
 }
-
-// snippet: example
-// func Run(ctx context.Context, count int, products ...*Product) ([]CompletedProduct, error) {
-// 	// NOTE: this function should not be the one to create
-// 	// the necessary contexts, time outs, signals, etc.
-// 	// The Run method should not care about those concerns,
-// 	// only its own.
-
-// 	// TODO: implement this function
-// 	// This function should run the manager with the given products
-// 	// and return the results.
-
-// 	//start a new manager
-// 	// m := NewManager()
-
-// 	// //start with the number of employees
-// 	// err := m.Start(count)
-// 	// if err != nil {
-// 	// 	return nil, err
-// 	// }
-// 	// //assign products to distribute jobs
-// 	// err = m.Assign(products...)
-// 	// if err != nil {
-// 	// 	return nil, err
-// 	// }
-
-// 	// var cp []CompletedProduct
-
-// 	// go func() {
-// 	// 	for p := range m.Completed(){
-// 	// 		cp = append(cp, p)
-// 	// 	}
-// 	// }()
-
-// 	// return nil, nil
-// }
-
-// snippet: example
