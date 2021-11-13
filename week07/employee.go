@@ -1,4 +1,4 @@
-package week07
+package week06
 
 // Employee is a worker.
 type Employee int

@@ -1,4 +1,4 @@
-package week07
+package week06
 
 // CompletedProduct represents a completed product
 type CompletedProduct struct {
