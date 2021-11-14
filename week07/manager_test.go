@@ -2,9 +2,13 @@ package week06
 
 import (
 	"context"
+	"os/signal"
+	"syscall"
 	"testing"
 	"time"
 )
+
+const TEST_SIGNAL = syscall.SIGUSR2
 
 func Test_Manager_Start_Fail(t *testing.T) {
 	t.Parallel()
@@ -201,7 +205,8 @@ func Test_Manager_Done(t *testing.T) {
 
 func Test_Run_Successful_Output_Tested(t *testing.T) {
 	t.Parallel()
-
+	ctx := context.Background()
+	count := 5
 	p := []*Product{
 		&Product{Quantity: 1},
 		&Product{Quantity: 2},
@@ -209,9 +214,6 @@ func Test_Run_Successful_Output_Tested(t *testing.T) {
 		&Product{Quantity: 4},
 		&Product{Quantity: 5},
 	}
-	ctx := context.Background()
-
-	count := 5
 
 	act, err := Run(ctx, count, p...)
 
@@ -225,16 +227,34 @@ func Test_Run_Successful_Output_Tested(t *testing.T) {
 
 }
 
+func Test_Run_Error(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	count := 5
+	p := []*Product{
+		&Product{Quantity: 1},
+		&Product{Quantity: 2},
+		&Product{Quantity: 3},
+		&Product{Quantity: 4},
+		&Product{Quantity: 0},
+	}
+	exp := ErrInvalidQuantity(0)
+
+	_, err := Run(ctx, count, p...)
+
+	if err.Error() != exp.Error() {
+		t.Fatalf("expected %v got %v", exp.Error(), err.Error())
+	}
+}
+
 func Test_Run_With_TimeOut(t *testing.T) {
 	t.Parallel()
 
-	
-	p := &Product{Quantity: 50000}
-	
-	count := 1
-	
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 	defer cancel()
+	p := &Product{Quantity: 25000}
+	count := 1
 
 	Run(ctx, count , p)
 
@@ -242,6 +262,35 @@ func Test_Run_With_TimeOut(t *testing.T) {
 
 	if ctx.Err().Error() != "context deadline exceeded" {
 		t.Fatalf("expected %v got %v", "context deadline exceeded", ctx.Err().Error())
+	}
+
+}
+
+func Test_Run_Interrupted_Signal(t *testing.T){
+	t.Parallel()
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+
+	sigCtx, cancel := signal.NotifyContext(ctx, TEST_SIGNAL)
+	defer cancel()
+
+	p := &Product{Quantity: 300000}
+	count := 1
+
+	go Run(sigCtx, count, p)
+
+	go func(){
+		time.Sleep(time.Second)
+		syscall.Kill(syscall.Getpid(), TEST_SIGNAL)
+	}()
+
+	exp := context.Canceled.Error()
+
+	<-sigCtx.Done()
+	
+	if  sigCtx.Err().Error() != exp {
+		t.Fatalf("expected: %v got %v", exp, sigCtx.Err().Error())
 	}
 
 }

@@ -161,13 +161,11 @@ func Run(ctx context.Context, count int, products ...*Product) ([]CompletedProdu
 
 	//start a new manager
 	m := NewManager()
-	// defer m.Stop()
 
 	//start with the number of employees
 	err := m.Start(ctx, count)
 	if err != nil {
 		return nil, err
-		// m.Errors() <- err
 	}
 
 	//assign products to distribute jobs
@@ -195,8 +193,8 @@ func Run(ctx context.Context, count int, products ...*Product) ([]CompletedProdu
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()
-	case e := <-m.Errors():
-		return nil, e
+	case err := <-m.Errors():
+		return nil, err
 	case <-m.Done():
 
 	}
