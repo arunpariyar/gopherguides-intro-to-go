@@ -3,6 +3,7 @@ package week06
 import (
 	"context"
 	"testing"
+	"time"
 )
 
 func Test_Manager_Start_Fail(t *testing.T) {
@@ -36,7 +37,7 @@ func Test_Manager_Start_Success(t *testing.T) {
 
 	if err == nil {
 		go func() {
-			m.Assign(&Product{Quantity: 10})
+			m.Assign(ctx, &Product{Quantity: 10})
 		}()
 		act := <-m.completed
 
@@ -51,11 +52,11 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 	m := NewManager()
 	defer m.Stop()
 	exp := ErrManagerStopped{}
-
+	ctx := context.Background()
 	//stopping the manager
 	m.Stop()
 
-	act := m.Assign(&Product{})
+	act := m.Assign(ctx,&Product{})
 
 	if act.Error() != exp.Error() {
 		t.Fatalf("expected %q got %q", exp.Error(), act.Error())
@@ -69,12 +70,12 @@ func Test_Manager_Assign_Success(t *testing.T) {
 	p1 := &Product{Quantity: 1}
 	p2 := &Product{Quantity: 2}
 	p3 := &Product{Quantity: 3}
-
+	ctx := context.Background()
 	exp := 6
 	act := 0
 
 	go func() {
-		m.Assign(p1, p2, p3)
+		m.Assign(ctx, p1, p2, p3)
 		close(m.jobs)
 	}()
 	//aggregating the total product quantity to compare with total products quatity "exp"
@@ -175,7 +176,7 @@ func Test_Manager_Completed(t *testing.T) {
 	go e.work(ctx, m)
 
 	go func() {
-		m.Assign(&Product{Quantity: 10})
+		m.Assign(ctx, &Product{Quantity: 10})
 	}()
 
 	act := <-m.completedCh()
@@ -198,30 +199,9 @@ func Test_Manager_Done(t *testing.T) {
 	}
 }
 
-// func Test_Run_With_TimeOut(t *testing.T) {
-// 	t.Parallel()
-// 	p := []*Product{
-// 		&Product{Quantity: 10000},
-// 		&Product{Quantity: 10000},
-// 		&Product{Quantity: 10000},
-// 		&Product{Quantity: 10000},
-// 		&Product{Quantity: 10000},
-
-// 	}
-// 	ctx, cancel :=context.WithTimeout(context.Background(), 5 * time.Second)
-// 	defer cancel()
-
-// 	_, err := Run(ctx, 2, 5, p...)
-
-// 	// fmt.Println(act)
-
-// 	if err != context.DeadlineExceeded {
-// 		t.Fatalf("expected %v got %v", "context.DeadlineExceeded", err.Error() )
-// 	}
-// }
-
 func Test_Run_Successful_Output_Tested(t *testing.T) {
 	t.Parallel()
+
 	p := []*Product{
 		&Product{Quantity: 1},
 		&Product{Quantity: 2},
@@ -230,19 +210,38 @@ func Test_Run_Successful_Output_Tested(t *testing.T) {
 		&Product{Quantity: 5},
 	}
 	ctx := context.Background()
+
 	count := 5
 
-	m := NewManager()
-	defer m.Stop()
-
-	act, err := Run(ctx, 3, 5, p...)
+	act, err := Run(ctx, count, p...)
 
 	if err != nil {
 		t.Fatalf("expected %v got %v", nil, act)
 	}
 
-	if len(act) != count {
+	if len(act) != 5 {
 		t.Fatalf("expected %v got %v", count, len(act))
+	}
+
+}
+
+func Test_Run_With_TimeOut(t *testing.T) {
+	t.Parallel()
+
+	
+	p := &Product{Quantity: 50000}
+	
+	count := 1
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+
+	Run(ctx, count , p)
+
+	<-ctx.Done()
+
+	if ctx.Err().Error() != "context deadline exceeded" {
+		t.Fatalf("expected %v got %v", "context deadline exceeded", ctx.Err().Error())
 	}
 
 }

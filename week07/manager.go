@@ -41,11 +41,6 @@ func (m *Manager) Start(ctx context.Context, count int) error {
 		return ErrInvalidEmployeeCount(count)
 	}
 
-	// go func() {
-	// 	<-ctx.Done()
-	// 	m.Stop()
-	// }()
-
 	for i := 0; i < count; i++ {
 
 		e := Employee(i + 1)
@@ -58,7 +53,7 @@ func (m *Manager) Start(ctx context.Context, count int) error {
 // Assign will assign the given products to employees
 // as employeess become available. An invalid product
 // will return an error.
-func (m *Manager) Assign(products ...*Product) error {
+func (m *Manager) Assign(ctx context.Context, products ...*Product) error {
 	if m.stopped {
 		return ErrManagerStopped{}
 	}
@@ -73,8 +68,7 @@ func (m *Manager) Assign(products ...*Product) error {
 		// assign product to employee
 		// this will block until an employee becomes available
 		
-			m.Jobs() <- p
-	
+		m.Jobs() <- p
 
 	}
 
@@ -159,7 +153,7 @@ func (m *Manager) Stop() {
 	close(m.completed)
 }
 
-func Run(ctx context.Context, emp int, count int, products ...*Product) ([]CompletedProduct, error) {
+func Run(ctx context.Context, count int, products ...*Product) ([]CompletedProduct, error) {
 
 	// TODO: implement this function
 	// This function should run the manager with the given products
@@ -167,25 +161,23 @@ func Run(ctx context.Context, emp int, count int, products ...*Product) ([]Compl
 
 	//start a new manager
 	m := NewManager()
-	defer m.Stop()
+	// defer m.Stop()
 
 	//start with the number of employees
-	err := m.Start(ctx, emp)
+	err := m.Start(ctx, count)
 	if err != nil {
 		return nil, err
 		// m.Errors() <- err
 	}
 
 	//assign products to distribute jobs
-	if !m.stopped {
-		go func() {
+	go func() {
+		err = m.Assign(ctx, products...)
+		if err != nil {
+			m.Errors() <- err
+		}
 
-			err = m.Assign(products...)
-			if err != nil {
-				m.Errors() <- err
-			}
-		}()
-	}
+	}()
 	//storage for all completed product
 	var cp []CompletedProduct
 
