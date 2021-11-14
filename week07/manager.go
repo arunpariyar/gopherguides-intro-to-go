@@ -41,10 +41,10 @@ func (m *Manager) Start(ctx context.Context, count int) error {
 		return ErrInvalidEmployeeCount(count)
 	}
 
-	go func() {
-		<-ctx.Done()
-		m.Stop()
-	}()
+	// go func() {
+	// 	<-ctx.Done()
+	// 	m.Stop()
+	// }()
 
 	for i := 0; i < count; i++ {
 
@@ -72,9 +72,9 @@ func (m *Manager) Assign(products ...*Product) error {
 
 		// assign product to employee
 		// this will block until an employee becomes available
-		if !m.stopped {
+		
 			m.Jobs() <- p
-		}
+	
 
 	}
 
@@ -204,7 +204,6 @@ func Run(ctx context.Context, emp int, count int, products ...*Product) ([]Compl
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	case e := <-m.Errors():
-		m.Stop()
 		return nil, e
 	case <-m.Done():
 

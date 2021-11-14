@@ -206,11 +206,11 @@ func Test_Manager_Done(t *testing.T) {
 // 		&Product{Quantity: 10000},
 // 		&Product{Quantity: 10000},
 // 		&Product{Quantity: 10000},
-		
+
 // 	}
 // 	ctx, cancel :=context.WithTimeout(context.Background(), 5 * time.Second)
 // 	defer cancel()
-		
+
 // 	_, err := Run(ctx, 2, 5, p...)
 
 // 	// fmt.Println(act)

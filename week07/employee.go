@@ -33,7 +33,6 @@ func (e Employee) work(ctx context.Context, m *Manager) {
 		// listen for messages on different channels
 		select {
 		case <-ctx.Done():
-			m.Stop()
 		case <-m.Done(): // listen for the manager to signal that it is done
 			return
 		case p, ok := <-m.Jobs(): // listen for a new job
