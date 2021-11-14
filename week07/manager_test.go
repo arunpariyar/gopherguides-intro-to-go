@@ -275,7 +275,7 @@ func Test_Run_Interrupted_Signal(t *testing.T) {
 	sigCtx, cancel := signal.NotifyContext(ctx, TEST_SIGNAL)
 	defer cancel()
 
-	p := &Product{Quantity: 300000}
+	p := &Product{Quantity: 30000}
 	count := 1
 
 	go Run(sigCtx, count, p)

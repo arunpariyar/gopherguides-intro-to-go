@@ -170,7 +170,6 @@ func Run(ctx context.Context, count int, products ...*Product) ([]CompletedProdu
 		if err != nil {
 			m.Errors() <- err
 		}
-
 	}()
 	//storage for all completed product
 	var cp []CompletedProduct
