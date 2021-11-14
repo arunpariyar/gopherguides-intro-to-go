@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const TEST_SIGNAL = syscall.SIGUSR2
+
 
 func Test_Manager_Start_Fail(t *testing.T) {
 	t.Parallel()
@@ -268,6 +268,8 @@ func Test_Run_With_TimeOut(t *testing.T) {
 
 func Test_Run_Interrupted_Signal(t *testing.T){
 	t.Parallel()
+
+	const TEST_SIGNAL = syscall.SIGUSR2
 	
 	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
 	defer cancel()
