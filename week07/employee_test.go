@@ -55,7 +55,7 @@ func Test_Employee_Work_Error(t *testing.T) {
 	go e.work(ctx, m)
 
 	go func() {
-		m.Assign(ctx, &Product{Quantity: 1})
+		m.Assign(&Product{Quantity: 1})
 	}()
 
 	act := <-m.Errors()
@@ -82,7 +82,7 @@ func Test_Employee_Work_Success(t *testing.T) {
 	go e.work(ctx, m)
 
 	go func() {
-		m.Assign(ctx, &Product{Quantity: 10})
+		m.Assign(&Product{Quantity: 10})
 	}()
 
 	act := <-m.completed

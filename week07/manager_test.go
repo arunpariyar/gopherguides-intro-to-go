@@ -8,8 +8,6 @@ import (
 	"time"
 )
 
-
-
 func Test_Manager_Start_Fail(t *testing.T) {
 	t.Parallel()
 	m := NewManager()
@@ -41,7 +39,7 @@ func Test_Manager_Start_Success(t *testing.T) {
 
 	if err == nil {
 		go func() {
-			m.Assign(ctx, &Product{Quantity: 10})
+			m.Assign(&Product{Quantity: 10})
 		}()
 		act := <-m.completed
 
@@ -56,11 +54,11 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 	m := NewManager()
 	defer m.Stop()
 	exp := ErrManagerStopped{}
-	ctx := context.Background()
+
 	//stopping the manager
 	m.Stop()
 
-	act := m.Assign(ctx,&Product{})
+	act := m.Assign(&Product{})
 
 	if act.Error() != exp.Error() {
 		t.Fatalf("expected %q got %q", exp.Error(), act.Error())
@@ -74,12 +72,12 @@ func Test_Manager_Assign_Success(t *testing.T) {
 	p1 := &Product{Quantity: 1}
 	p2 := &Product{Quantity: 2}
 	p3 := &Product{Quantity: 3}
-	ctx := context.Background()
+
 	exp := 6
 	act := 0
 
 	go func() {
-		m.Assign(ctx, p1, p2, p3)
+		m.Assign(p1, p2, p3)
 		close(m.jobs)
 	}()
 	//aggregating the total product quantity to compare with total products quatity "exp"
@@ -180,7 +178,7 @@ func Test_Manager_Completed(t *testing.T) {
 	go e.work(ctx, m)
 
 	go func() {
-		m.Assign(ctx, &Product{Quantity: 10})
+		m.Assign(&Product{Quantity: 10})
 	}()
 
 	act := <-m.completedCh()
@@ -251,12 +249,12 @@ func Test_Run_Error(t *testing.T) {
 func Test_Run_With_TimeOut(t *testing.T) {
 	t.Parallel()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	p := &Product{Quantity: 25000}
 	count := 1
 
-	Run(ctx, count , p)
+	Run(ctx, count, p)
 
 	<-ctx.Done()
 
@@ -266,12 +264,12 @@ func Test_Run_With_TimeOut(t *testing.T) {
 
 }
 
-func Test_Run_Interrupted_Signal(t *testing.T){
+func Test_Run_Interrupted_Signal(t *testing.T) {
 	t.Parallel()
 
 	const TEST_SIGNAL = syscall.SIGUSR2
-	
-	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	sigCtx, cancel := signal.NotifyContext(ctx, TEST_SIGNAL)
@@ -282,7 +280,7 @@ func Test_Run_Interrupted_Signal(t *testing.T){
 
 	go Run(sigCtx, count, p)
 
-	go func(){
+	go func() {
 		time.Sleep(time.Second)
 		syscall.Kill(syscall.Getpid(), TEST_SIGNAL)
 	}()
@@ -290,8 +288,8 @@ func Test_Run_Interrupted_Signal(t *testing.T){
 	exp := context.Canceled.Error()
 
 	<-sigCtx.Done()
-	
-	if  sigCtx.Err().Error() != exp {
+
+	if sigCtx.Err().Error() != exp {
 		t.Fatalf("expected: %v got %v", exp, sigCtx.Err().Error())
 	}
 
