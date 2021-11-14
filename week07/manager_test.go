@@ -2,8 +2,8 @@ package week06
 
 import (
 	"context"
-	"fmt"
 	"testing"
+	"time"
 )
 
 func Test_Manager_Start_Fail(t *testing.T) {
@@ -151,7 +151,6 @@ func Test_Manager_Complete_Fail(t *testing.T) {
 			if act.Error() != tt.exp.Error() {
 				t.Fatalf("expected %v got %v", tt.exp.Error(), act.Error())
 			}
-
 		})
 	}
 }
@@ -200,13 +199,51 @@ func Test_Manager_Done(t *testing.T) {
 	}
 }
 
-func Test_Run(t *testing.T) {
+func Test_Run_With_TimeOut(t *testing.T) {
+	t.Parallel()
+	p := []*Product{
+		&Product{Quantity: 10000},
+		&Product{Quantity: 10000},
+		&Product{Quantity: 10000},
+		&Product{Quantity: 10000},
+		&Product{Quantity: 10000},
+		
+	}
+	ctx, cancel :=context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+		
+	_, err := Run(ctx, 2, 5, p...)
+
+	// fmt.Println(act)
+
+	if err != context.DeadlineExceeded {
+		t.Fatalf("expected %v got %v", "context.DeadlineExceeded", err.Error() )
+	}
+}
+
+func Test_Run_Successful_Output_Tested(t *testing.T) {
+	t.Parallel()
+	p := []*Product{
+		&Product{Quantity: 1},
+		&Product{Quantity: 2},
+		&Product{Quantity: 3},
+		&Product{Quantity: 4},
+		&Product{Quantity: 5},
+	}
 	ctx := context.Background()
+	count := 5
 
-	p1 := &Product{Quantity: 1}
-	p2 := &Product{Quantity: 2}
+	m := NewManager()
+	defer m.Stop()
 
-	cp, err := Run(ctx, 2,2, p1, p2)
+	act, err := Run(ctx, 3, 5, p...)
 
-	fmt.Println(cp, err)
+	if err != nil {
+		t.Fatalf("expected %v got %v", nil, act)
+	}
+
+	if len(act) != count {
+		t.Fatalf("expected %v got %v", count, len(act))
+	}
+
 }

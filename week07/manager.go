@@ -2,7 +2,6 @@ package week06
 
 import (
 	"context"
-	"fmt"
 )
 
 // Manager is responsible for receiving product orders
@@ -73,7 +72,10 @@ func (m *Manager) Assign(products ...*Product) error {
 
 		// assign product to employee
 		// this will block until an employee becomes available
-		m.Jobs() <- p
+		if !m.stopped {
+			m.Jobs() <- p
+		}
+
 	}
 
 	return nil
@@ -103,7 +105,9 @@ func (m *Manager) Complete(e Employee, p *Product) error {
 	// Send completed product to Completed() channel
 	// for a listener to receive it.
 	// This will block until a listener is available.
-	m.completedCh() <- cp
+	if !m.stopped {
+		m.completedCh() <- cp
+	}
 
 	return nil
 }
@@ -155,12 +159,12 @@ func (m *Manager) Stop() {
 	close(m.completed)
 }
 
-func Run(ctx context.Context, emp int,  count int, products ...*Product) ([]CompletedProduct, error) {
+func Run(ctx context.Context, emp int, count int, products ...*Product) ([]CompletedProduct, error) {
 
 	// TODO: implement this function
 	// This function should run the manager with the given products
 	// and return the results.
-	
+
 	//start a new manager
 	m := NewManager()
 	defer m.Stop()
@@ -168,16 +172,20 @@ func Run(ctx context.Context, emp int,  count int, products ...*Product) ([]Comp
 	//start with the number of employees
 	err := m.Start(ctx, emp)
 	if err != nil {
-		m.errs <- err
+		return nil, err
+		// m.Errors() <- err
 	}
 
 	//assign products to distribute jobs
-	go func() {
-		err = m.Assign(products...)
-		if err != nil {
-			m.Errors() <- err
-		}
-	}()
+	if !m.stopped {
+		go func() {
+
+			err = m.Assign(products...)
+			if err != nil {
+				m.Errors() <- err
+			}
+		}()
+	}
 	//storage for all completed product
 	var cp []CompletedProduct
 
@@ -186,17 +194,17 @@ func Run(ctx context.Context, emp int,  count int, products ...*Product) ([]Comp
 			cp = append(cp, p)
 
 			if len(cp) == count {
-					m.Stop()
+				m.Stop()
 			}
 		}
-	
+
 	}()
 
 	select {
 	case <-ctx.Done():
-		fmt.Println("Context Done")
-		m.Stop()
+		return nil, ctx.Err()
 	case e := <-m.Errors():
+		m.Stop()
 		return nil, e
 	case <-m.Done():
 
