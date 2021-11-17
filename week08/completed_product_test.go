@@ -31,7 +31,7 @@ func Test_Completed_Product_IsValid(t *testing.T) {
 			cp: CompletedProduct{
 				Product: Product{
 					Materials: Materials{},
-					builtBy: 10,
+					builtBy:   10,
 				},
 				Employee: 10,
 			},
@@ -46,7 +46,7 @@ func Test_Completed_Product_IsValid(t *testing.T) {
 						Oil:     2,
 						Plastic: 3,
 						Wood:    4,
-					},	
+					},
 				},
 				Employee: 10,
 			},
@@ -57,8 +57,8 @@ func Test_Completed_Product_IsValid(t *testing.T) {
 	for _, tt := range table {
 		t.Run(tt.name, func(t *testing.T) {
 			act := tt.cp.IsValid()
-			if act != tt.exp{
-				t.Fatalf("expected %v got %v",tt.exp, act)
+			if act != tt.exp {
+				t.Fatalf("expected %v got %v", tt.exp, act)
 			}
 		})
 	}
