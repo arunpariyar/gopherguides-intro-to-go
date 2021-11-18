@@ -40,7 +40,7 @@ func Test_Errors_All(t *testing.T) {
 	for _, tt := range table {
 		t.Run(tt.name, func(t *testing.T) {
 			act := tt.e.Error()
-			
+
 			if act != tt.exp {
 				t.Fatalf("expected %v got %v", tt.exp, act)
 			}
