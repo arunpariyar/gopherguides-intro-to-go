@@ -2,6 +2,7 @@ package week08
 
 import (
 	"context"
+	"sync"
 )
 
 // Manager is responsible for receiving product orders
@@ -16,6 +17,8 @@ type Manager struct {
 	errs      chan error
 	jobs      chan *Product
 	stopped   bool
+	once      sync.Once
+	sync.Mutex
 }
 
 // Start will create new employees for the given count,
@@ -36,11 +39,12 @@ func (m *Manager) Start(ctx context.Context, count int) (context.Context, error)
 	m.cancel = cancel
 
 	// launch a goroutine to listen context cancellation
-	go func() {
+	go func(ctx context.Context) {
 
 		// listen for context cancellation
 		// this could come from the external context
 		// passed to m.Start()
+
 		<-ctx.Done()
 
 		// call the cancel function
@@ -48,7 +52,7 @@ func (m *Manager) Start(ctx context.Context, count int) (context.Context, error)
 
 		// call Stop()
 		m.Stop()
-	}()
+	}(ctx)
 
 	if m.Warehouse == nil {
 		m.Warehouse = &Warehouse{}
@@ -127,9 +131,11 @@ func (m *Manager) Complete(e Employee, p *Product) error {
 
 // completedCh returns the channel for CompletedProducts
 func (m *Manager) completedCh() chan CompletedProduct {
+	m.Lock()
 	if m.completed == nil {
 		m.completed = make(chan CompletedProduct)
 	}
+	m.Unlock()
 	return m.completed
 }
 
@@ -143,9 +149,12 @@ func (m *Manager) Completed() <-chan CompletedProduct {
 // Jobs will return a channel that can be listened to
 // for new products to be built.
 func (m *Manager) Jobs() chan *Product {
+	m.Lock()
 	if m.jobs == nil {
 		m.jobs = make(chan *Product)
 	}
+	m.Unlock()
+
 	return m.jobs
 }
 
@@ -160,23 +169,28 @@ func (m *Manager) Errors() chan error {
 
 // Stop will stop the manager and clean up all resources.
 func (m *Manager) Stop() {
-	m.cancel()
-	if m.stopped {
-		return
-	}
 
-	m.stopped = true
+	m.once.Do(func() {
+		m.Lock()
+		m.cancel()
+		if m.stopped {
+			return
+		}
 
-	// close all channels
-	if m.jobs != nil {
-		close(m.jobs)
-	}
+		m.stopped = true
 
-	if m.errs != nil {
-		close(m.errs)
-	}
+		// close all channels
+		if m.jobs != nil {
+			close(m.jobs)
+		}
 
-	if m.completed != nil {
-		close(m.completed)
-	}
+		if m.errs != nil {
+			close(m.errs)
+		}
+
+		if m.completed != nil {
+			close(m.completed)
+		}
+		m.Unlock()
+	})
 }

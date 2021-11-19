@@ -39,6 +39,7 @@ func (w *Warehouse) Retrieve(m Material, q int) (Material, error) {
 
 // fill the warehouse with the material until it is full
 func (w *Warehouse) fill(m Material) context.Context {
+
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// lauch a goroutine to fill the warehouse
