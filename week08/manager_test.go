@@ -64,7 +64,7 @@ func Test_Manager_Assign_Stopped(t *testing.T) {
 	}
 }
 
-func Test_Manager_Assign(t *testing.T) {
+func Test_Manager_Assign_Errors(t *testing.T) {
 	table := []struct {
 		name    string
 		m       *Manager
@@ -84,7 +84,7 @@ func Test_Manager_Assign(t *testing.T) {
 			exp:     ErrInvalidMaterials(0),
 		},
 		{
-			name: "invalid materials",
+			name: "nil",
 			m:    &Manager{},
 			ps: &Product{
 				Materials: Materials{
@@ -107,7 +107,7 @@ func Test_Manager_Assign(t *testing.T) {
 			act := tt.m.Assign(tt.ps)
 
 			if act != tt.exp {
-				tt.m.Stop()
+				// tt.m.Stop()
 				t.Fatalf("expected %v got %v", tt.exp, act)
 			}
 		})

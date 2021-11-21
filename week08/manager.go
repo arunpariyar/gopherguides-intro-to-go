@@ -117,12 +117,10 @@ func (m *Manager) Complete(e Employee, p *Product) error {
 		return err
 	}
 
-	m.Lock()
 	cp := CompletedProduct{
 		Employee: e,
 		Product:  *p, // deference pointer to value type ype t
 	}
-	m.Unlock()
 
 	// Send completed product to Completed() channel
 	// for a listener to receive it.
@@ -179,6 +177,7 @@ func (m *Manager) Stop() {
 
 	m.Lock()
 	m.stopped = true
+
 	if m.stopped {
 		return
 	}
