@@ -33,9 +33,9 @@ func Test_Manager_Start(t *testing.T) {
 	for _, tt := range table {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := tt.m.Start(tt.rootCtx, tt.count)
+
 			if err != tt.exp {
-				//stopping manager before fatal to avoid any resource leakage∏
-				tt.m.Stop()
+
 				t.Fatalf("expected %v got %v", tt.exp, err)
 
 			}

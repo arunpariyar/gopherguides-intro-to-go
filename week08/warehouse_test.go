@@ -64,3 +64,16 @@ func Test_Warehouse_fill(t *testing.T) {
 		t.Fatalf("expected %v got %v", exp, len(w.materials))
 	}
 }
+
+func Test_Warehouse_Stop(t *testing.T) {
+	w := &Warehouse{}
+
+	w.Start(context.Background())
+
+	w.Stop()
+
+	if len(w.materials) != 0 && w.cap != 0 {
+		t.Fatalf("expected w.material: %v got %v w.cap %v got %v", 0, 0, len(w.materials), w.cap)
+
+	}
+}

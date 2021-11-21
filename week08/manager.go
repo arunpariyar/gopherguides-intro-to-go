@@ -132,10 +132,11 @@ func (m *Manager) Complete(e Employee, p *Product) error {
 // completedCh returns the channel for CompletedProducts
 func (m *Manager) completedCh() chan CompletedProduct {
 	m.Lock()
+	defer m.Unlock()
 	if m.completed == nil {
 		m.completed = make(chan CompletedProduct)
 	}
-	m.Unlock()
+
 	return m.completed
 }
 
@@ -161,6 +162,7 @@ func (m *Manager) Jobs() chan *Product {
 // Errors will return a channel that can be listened to
 // and can be used to receive errors from employees.
 func (m *Manager) Errors() chan error {
+
 	if m.errs == nil {
 		m.errs = make(chan error)
 	}
@@ -172,11 +174,6 @@ func (m *Manager) Stop() {
 
 	m.once.Do(func() {
 		m.Lock()
-		m.cancel()
-		if m.stopped {
-			return
-		}
-
 		m.stopped = true
 
 		// close all channels
@@ -190,6 +187,10 @@ func (m *Manager) Stop() {
 
 		if m.completed != nil {
 			close(m.completed)
+		}
+		m.cancel()
+		if m.stopped {
+			return
 		}
 		m.Unlock()
 	})

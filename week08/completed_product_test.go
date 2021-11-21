@@ -33,9 +33,9 @@ func Test_Completed_Product_IsValid(t *testing.T) {
 					Materials: Materials{},
 					builtBy:   10,
 				},
-				Employee: 10,
+				Employee: 0,
 			},
-			exp: ErrInvalidMaterials(0),
+			exp: ErrInvalidEmployee(0),
 		},
 		{
 			name: "product not built",

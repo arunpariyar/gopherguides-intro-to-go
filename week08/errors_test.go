@@ -44,7 +44,6 @@ func Test_Errors_All(t *testing.T) {
 			if act != tt.exp {
 				t.Fatalf("expected %v got %v", tt.exp, act)
 			}
-
 		})
 	}
 }
