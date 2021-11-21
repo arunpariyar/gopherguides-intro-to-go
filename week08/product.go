@@ -60,6 +60,7 @@ func (p *Product) Build(e Employee, w *Warehouse) error {
 	}
 
 	// mark the product as built
+
 	p.builtBy = e
 
 	return nil

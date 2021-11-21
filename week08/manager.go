@@ -39,6 +39,7 @@ func (m *Manager) Start(ctx context.Context, count int) (context.Context, error)
 	m.cancel = cancel
 
 	// launch a goroutine to listen context cancellation
+
 	go func(ctx context.Context) {
 
 		// listen for context cancellation
@@ -116,10 +117,12 @@ func (m *Manager) Complete(e Employee, p *Product) error {
 		return err
 	}
 
+	m.Lock()
 	cp := CompletedProduct{
 		Employee: e,
 		Product:  *p, // deference pointer to value type ype t
 	}
+	m.Unlock()
 
 	// Send completed product to Completed() channel
 	// for a listener to receive it.
@@ -132,10 +135,10 @@ func (m *Manager) Complete(e Employee, p *Product) error {
 // completedCh returns the channel for CompletedProducts
 func (m *Manager) completedCh() chan CompletedProduct {
 	m.Lock()
-	defer m.Unlock()
 	if m.completed == nil {
 		m.completed = make(chan CompletedProduct)
 	}
+	m.Unlock()
 
 	return m.completed
 }
@@ -162,19 +165,26 @@ func (m *Manager) Jobs() chan *Product {
 // Errors will return a channel that can be listened to
 // and can be used to receive errors from employees.
 func (m *Manager) Errors() chan error {
-
+	m.Lock()
 	if m.errs == nil {
 		m.errs = make(chan error)
 	}
+	m.Unlock()
 	return m.errs
 }
 
 // Stop will stop the manager and clean up all resources.
 func (m *Manager) Stop() {
+	m.cancel()
+
+	m.Lock()
+	m.stopped = true
+	if m.stopped {
+		return
+	}
+	m.Unlock()
 
 	m.once.Do(func() {
-		m.Lock()
-		m.stopped = true
 
 		// close all channels
 		if m.jobs != nil {
@@ -188,10 +198,6 @@ func (m *Manager) Stop() {
 		if m.completed != nil {
 			close(m.completed)
 		}
-		m.cancel()
-		if m.stopped {
-			return
-		}
-		m.Unlock()
+
 	})
 }

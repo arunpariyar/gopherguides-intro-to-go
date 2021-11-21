@@ -39,36 +39,23 @@ func Test_Employee_Work_WithTimeOutContext(t *testing.T) {
 	//create a new manager
 	m := &Manager{}
 	e := Employee(5)
-	//create a context with timeOut cancellation
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
-	//set m.cancel to cancel
 	m.cancel = cancel
 	defer m.cancel()
 
 	e.work(ctx, m)
-
+	//listen for done
 	v := <-ctx.Done()
-
+	// compare to an empty struct
 	if v != struct{}{} {
 		t.Fatalf("expected %v got %v", v, struct{}{})
 	}
 }
 
 func Test_Employee_Work_Success(t *testing.T) {
-
 	m := &Manager{}
-	m.Warehouse = &Warehouse{
-		materials: Materials{
-			Metal: 5,
-			// Oil:     2,
-			Plastic: 5,
-			// Wood:    4,
-		},
-		cap: 10,
-	}
-
 	count := 5
-
 	ctx := context.Background()
 	p := &Product{
 		Materials: Materials{
@@ -78,12 +65,41 @@ func Test_Employee_Work_Success(t *testing.T) {
 	}
 
 	go m.Start(ctx, count)
-
 	go m.Assign(p)
-
+	//listen for the completed product
 	cp := <-m.completedCh()
 
 	if cp.Employee != p.builtBy {
 		t.Fatalf("expected %v got %v", p.builtBy, cp.Employee)
 	}
+}
+
+func Test_Employee_Work_Error(t *testing.T) {
+	m := &Manager{}
+	count := 5
+	ctx := context.Background()
+	p := &Product{
+		Materials: Materials{},
+	}
+
+	e := Employee(5)
+	exp := ErrInvalidMaterials(0)
+
+	ctx, err := m.Start(ctx, count)
+	if err != nil {
+		t.Fatalf("expected %v got %v", nil, err)
+	}
+
+	go e.work(ctx, m)
+
+	m.Jobs() <- p
+	//listen for the error
+	select {
+	case act := <-m.Errors():
+		if act != exp {
+			t.Fatalf("expected %v got %v", exp, act)
+		}
+	case <-ctx.Done():
+	}
+
 }
