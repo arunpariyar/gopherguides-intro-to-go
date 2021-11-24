@@ -3,28 +3,29 @@ package week09
 import (
 	"testing"
 )
-func Test_Stories_String(t *testing.T){
-	s1 := story{
-				title:  "Green Goblin Attacks Again",
-				body:   "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
-				writer: "Eddie Brock",
-			}
-	act := s1.String()	
+
+func Test_Stories_String(t *testing.T) {
+	d := draft{
+		title:  "Green Goblin Attacks Again",
+		body:   "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
+		writer: "Eddie Brock",
+	}
+	act := d.String()
 	exp := "Green Goblin Attacks Again\nNew York is being terrorised by Green Goblin yet again and spiderman is no where to be found.\nEddie Brock"
-	if act != exp{ 
-		t.Fatalf("expected \n %#v \n got \n %#v", exp, s1.String())
+	if act != exp {
+		t.Fatalf("expected \n %#v \n got \n %#v", exp, d.String())
 	}
 }
 
 func Test_Stories_IsValid(t *testing.T) {
 	table := []struct {
 		name string
-		s    story
+		d    draft
 		exp  error
 	}{
 		{
 			name: "valid story",
-			s: story{
+			d: draft{
 				title:  "Green Goblin Attacks Again",
 				body:   "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
 				writer: "Eddie Brock",
@@ -33,7 +34,7 @@ func Test_Stories_IsValid(t *testing.T) {
 		},
 		{
 			name: "title missing",
-			s: story{
+			d: draft{
 				title:  "",
 				body:   "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
 				writer: "Eddie Brock",
@@ -42,7 +43,7 @@ func Test_Stories_IsValid(t *testing.T) {
 		},
 		{
 			name: "body missing",
-			s: story{
+			d: draft{
 				title:  "Green Goblin Attacks Again",
 				body:   "",
 				writer: "Eddie Brock",
@@ -51,7 +52,7 @@ func Test_Stories_IsValid(t *testing.T) {
 		},
 		{
 			name: "writer missing",
-			s: story{
+			d: draft{
 				title:  "Green Goblin Attacks Again",
 				body:   "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
 				writer: "",
@@ -62,7 +63,7 @@ func Test_Stories_IsValid(t *testing.T) {
 
 	for _, tt := range table {
 		t.Run(tt.name, func(t *testing.T) {
-			act := tt.s.IsValid()
+			act := tt.d.IsValid()
 			if act != tt.exp {
 				t.Fatalf("expected %v got %v", tt.exp, act)
 			}
