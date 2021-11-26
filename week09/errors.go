@@ -26,8 +26,26 @@ func (e ErrStoryPublisherInvalid) Error() string {
 	return fmt.Sprintf("story must hava a publisher got %#v", string(e))
 }
 
-type ErrStoryCatagoriesInvalid int
+type ErrStoryCatagoryInvalid string
 
-func (e ErrStoryCatagoriesInvalid) Error() string {
-	return "story catagories is empty"
+func (e ErrStoryCatagoryInvalid) Error() string {
+	return fmt.Sprintf("story must hava a catagory got %#v", string(e))
+}
+
+type ErrSubscriberInvalidName string
+
+func (e ErrSubscriberInvalidName) Error() string {
+	return fmt.Sprintf("subscriber must hava a valid name got %#v", string(e))
+}
+
+type ErrSubscriberCatgoriesInvalid int
+
+func (e ErrSubscriberCatgoriesInvalid) Error() string {
+	return "subscriber must have at least one catagory"
+}
+
+type ErrSourcesEmpty int
+
+func(e ErrSourcesEmpty)Error() string {
+	return "news service sources is Empty"
 }

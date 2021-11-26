@@ -7,7 +7,7 @@ import (
 func Test_Source_Build(t *testing.T) {
 
 	s1 := &source{
-		name: "Daily Planet",
+		Name: "Daily Planet",
 	}
 
 	d := draft{
@@ -16,14 +16,14 @@ func Test_Source_Build(t *testing.T) {
 		writer: "Eddie Brock",
 	}
 	exp := story{
-		publisher:  "Daily Planet",
-		catagories: []catagory{"new york", "spider-man"},
-		title:      "Green Goblin Attacks Again",
-		body:       "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
-		writer:     "Eddie Brock",
+		publisher: "Daily Planet",
+		catagory:  "spider-man",
+		title:     "Green Goblin Attacks Again",
+		body:      "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
+		writer:    "Eddie Brock",
 	}
 
-	act, err := s1.build(d, "new york", "spider-man")
+	act, err := s1.build(d, "new york")
 
 	if err != nil {
 		if act.String() != exp.String() {
@@ -35,20 +35,20 @@ func Test_Source_Build(t *testing.T) {
 
 func Test_Source_Push(t *testing.T) {
 	s := &source{
-		name: "Daily Bugle",
+		Name: "Daily Bugle",
 	}
 	st := story{
-		publisher:  "Daily Planet",
-		catagories: []catagory{"new york", "spider-man"},
-		title:      "Green Goblin Attacks Again",
-		body:       "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
-		writer:     "Eddie Brock",
+		publisher: "Daily Planet",
+		catagory:  "new york",
+		title:     "Green Goblin Attacks Again",
+		body:      "New York is being terrorised by Green Goblin yet again and spiderman is no where to be found.",
+		writer:    "Eddie Brock",
 	}
 
 	act := s.push(st)
-	exp := 1 
+	exp := 1
 	if len(s.stories) != 1 {
-		t.Fatalf("expected %v got %v",exp, act)
+		t.Fatalf("expected %v got %v", exp, act)
 	}
-	
+
 }
