@@ -2,7 +2,7 @@ package week09
 
 import "fmt"
 
-type drafts []draft
+// type drafts []draft
 
 type draft struct {
 	title  string

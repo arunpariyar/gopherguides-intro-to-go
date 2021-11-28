@@ -4,9 +4,9 @@ import "fmt"
 
 type catagory string
 
-type publisher string
+// type publisher string
 
-type catagories []catagory
+// type catagories []catagory
 
 type story struct {
 	publisher string
@@ -19,7 +19,7 @@ type story struct {
 type stories []story
 
 func (s story) String() string {
-	return fmt.Sprintf("%v\n%v\n%v\n%v\n%v\n", s.publisher, s.catagory, s.title, s.body, s.writer)
+	return fmt.Sprintf("%v\n%v\n%v\n%v\n%v", s.publisher, s.catagory, s.title, s.body, s.writer)
 }
 
 func (s story) IsValid() error {

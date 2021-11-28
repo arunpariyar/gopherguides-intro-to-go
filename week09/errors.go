@@ -46,6 +46,6 @@ func (e ErrSubscriberCatgoriesInvalid) Error() string {
 
 type ErrSourcesEmpty int
 
-func(e ErrSourcesEmpty)Error() string {
-	return "news service sources is Empty"
+func (e ErrSourcesEmpty) Error() string {
+	return "news service sources is empty"
 }

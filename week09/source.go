@@ -1,14 +1,12 @@
 package week09
 
-import "context"
-
-type sources []source //collection type for source
+// type sources []source //collection type for source
 
 type source struct {
-	Name    string
-	ctx     context.Context
+	Name string
+	// ctx     context.Context
 	stories stories
-	draft   drafts
+	// draft   drafts
 }
 
 //need to create a function that will go through its vault and based on how many drafts there is build them to story and store it in the stories slice within source stories, stories will then be forward to the waiting channel of the news service
@@ -39,5 +37,3 @@ func (s *source) push(st story) error {
 	s.stories = append(s.stories, st)
 	return nil
 }
-
-//
