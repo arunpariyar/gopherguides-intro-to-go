@@ -2,8 +2,6 @@ package week06
 
 import (
 	"context"
-	"os/signal"
-	"syscall"
 	"testing"
 	"time"
 )
@@ -264,34 +262,34 @@ func Test_Run_With_TimeOut(t *testing.T) {
 
 }
 
-func Test_Run_Interrupted_Signal(t *testing.T) {
-	t.Skip()
-	t.Parallel()
+// func Test_Run_Interrupted_Signal(t *testing.T) {
+// 	t.Skip()
+// 	t.Parallel()
 
-	const TEST_SIGNAL = syscall.SIGUSR2
+// 	const TEST_SIGNAL = syscall.SIGUSR2
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+// 	defer cancel()
 
-	sigCtx, cancel := signal.NotifyContext(ctx, TEST_SIGNAL)
-	defer cancel()
+// 	sigCtx, cancel := signal.NotifyContext(ctx, TEST_SIGNAL)
+// 	defer cancel()
 
-	p := &Product{Quantity: 30000}
-	count := 1
+// 	p := &Product{Quantity: 30000}
+// 	count := 1
 
-	go Run(sigCtx, count, p)
+// 	go Run(sigCtx, count, p)
 
-	go func() {
-		time.Sleep(time.Second)
-		syscall.Kill(syscall.Getpid(), TEST_SIGNAL)
-	}()
+// 	go func() {
+// 		time.Sleep(time.Second)
+// 		syscall.Kill(syscall.Getpid(), TEST_SIGNAL)
+// 	}()
 
-	exp := context.Canceled.Error()
+// 	exp := context.Canceled.Error()
 
-	<-sigCtx.Done()
+// 	<-sigCtx.Done()
 
-	if sigCtx.Err().Error() != exp {
-		t.Fatalf("expected: %v got %v", exp, sigCtx.Err().Error())
-	}
+// 	if sigCtx.Err().Error() != exp {
+// 		t.Fatalf("expected: %v got %v", exp, sigCtx.Err().Error())
+// 	}
 
-}
+// }
