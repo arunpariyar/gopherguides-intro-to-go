@@ -5,7 +5,7 @@ import "fmt"
 type subscriber struct {
 	name       string
 	catagories []catagory
-	nChl 		chan news
+	nChl       chan news
 }
 
 func NewDemoSubscriber(n string, cs catagories) *subscriber {
