@@ -12,7 +12,7 @@ type MockSource struct {
 	cancel  context.CancelFunc
 	stopped bool
 	Once    sync.Once
-	sync.Mutex
+	sync.RWMutex
 }
 
 func NewMockSource(s string) *MockSource {
@@ -25,7 +25,9 @@ func NewMockSource(s string) *MockSource {
 }
 
 func (ms *MockSource) Start(ctx context.Context) context.Context {
+	ms.Lock()
 	ctx, ms.cancel = context.WithCancel(ctx)
+	ms.Unlock()
 	return ctx
 }
 
@@ -34,9 +36,11 @@ func (ms *MockSource) Name() string {
 }
 
 func (ms *MockSource) Publish(ctx context.Context, s story) {
+	ms.RLock()
 	if !ms.stopped {
 		ms.news <- s
 	}
+	ms.RUnlock()
 
 	<-ctx.Done()
 
@@ -58,7 +62,10 @@ func (ms *MockSource) Stop() {
 
 	ms.Once.Do(func() {
 		if ms.news != nil {
+			ms.Lock()
+			 
 			close(ms.news)
+			ms.Unlock()
 		}
 	})
 }
