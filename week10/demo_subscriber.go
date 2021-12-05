@@ -16,11 +16,6 @@ func NewDemoSubscriber(n string, cs catagories) *subscriber {
 	return ds
 }
 
-// func (s *subscriber) Start(ctx context.Context) context.Context{
-// 	ctx, s.cancel = context.WithCancel(ctx)
-// 	return ctx
-// }
-
 func (s subscriber) Name() string {
 	return s.name
 }
@@ -30,20 +25,7 @@ func (s subscriber) Catagories() catagories {
 }
 
 func (s subscriber) Receive(ch chan news) {
-
 	for news := range ch {
 		fmt.Println(news)
 	}
-	// for {
-	// 	select {
-	// 	// case <-ctx.Done():
-	// 	// 	fmt.Printf("%s is stopped", s.name)
-	// 	// 	return
-	// 	case news, ok := <-ch:
-	// 		if !ok {
-	// 			fmt.Printf("Channel closed")
-	// 		}
-	// 		fmt.Printf("News: %v \n", news)
-	// 	}
-	// }
 }

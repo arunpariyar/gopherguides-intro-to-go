@@ -63,7 +63,6 @@ func (ms *MockSource) Stop() {
 	ms.Once.Do(func() {
 		if ms.news != nil {
 			ms.Lock()
-			 
 			close(ms.news)
 			ms.Unlock()
 		}

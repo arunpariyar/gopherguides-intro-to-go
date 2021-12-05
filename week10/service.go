@@ -1,6 +1,10 @@
 package week10
 
-import "sync"
+import (
+	"context"
+	"fmt"
+	"sync"
+)
 
 type service struct {
 	subs    map[string]catagories
@@ -8,6 +12,9 @@ type service struct {
 	sub_chl map[string]chan news
 	src_chl map[string]chan story
 	history []news
+	Once    sync.Once
+	stopped bool
+	cancel  context.CancelFunc
 	sync.Mutex
 }
 
@@ -22,10 +29,14 @@ func NewService() *service {
 	return s
 }
 
-func (s *service) Start() {
+func (s *service) Start(ctx context.Context) context.Context {
+	ctx, s.cancel = context.WithCancel(ctx)
+
 	for _, ch := range s.src_chl {
-		go s.listen(ch)
+		go s.listen(ctx, ch)
 	}
+
+	return ctx
 }
 
 func (ns *service) Subscribe(s Subscriber) chan news {
@@ -46,7 +57,7 @@ func (ns *service) Add(s Source) {
 
 }
 
-func (ns *service) listen(ch chan story) {
+func (ns *service) listen(ctx context.Context, ch chan story) {
 	// convert story to news
 	for st := range ch {
 		func(st story) { //not running this as a go routine otherwise it won't get the ids right
@@ -60,6 +71,8 @@ func (ns *service) listen(ch chan story) {
 			ns.Publish(news)
 		}(st)
 	}
+	<-ctx.Done()
+	fmt.Println("News Service Closing Down")
 }
 
 func (ns *service) Publish(n news) {
@@ -71,9 +84,43 @@ func (ns *service) Publish(n news) {
 	for sub, cs := range ns.subs {
 		for _, c := range cs {
 			if string(n.catagory) == string(c) {
+				ns.Lock()
 				ch := ns.sub_chl[sub]
 				ch <- n
+				ns.Unlock()
 			}
 		}
 	}
+}
+
+func (ns *service) Stop() {
+	ns.cancel()
+	if ns.stopped {
+		return
+	}
+
+	ns.Lock()
+	ns.stopped = true
+	ns.Unlock()
+
+	ns.Once.Do(func() {
+		//closing all source channels
+		for _, ch := range ns.src_chl {
+			if ch != nil {
+				ns.Lock()
+				close(ch)
+				ns.Unlock()
+			}
+		}
+
+		//closing all subscribers channels
+		for _, ch := range ns.sub_chl {
+			if ch != nil {
+				ns.Lock()
+				close(ch)
+				ns.Unlock()
+			}
+		}
+	})
+
 }
