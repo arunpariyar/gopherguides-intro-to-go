@@ -1,8 +1,10 @@
 package week10
 
 import (
+	"context"
 	"fmt"
 	"testing"
+	"time"
 )
 
 func Test_Service_Unit(t *testing.T) {
@@ -20,11 +22,15 @@ func Test_Service_Unit(t *testing.T) {
 	// save it the the demo subsriber news channnel
 	//Create some Mock Source
 	m := NewMockSource("mock1")
-	n := NewMockSource("mock2")
+	// n := NewMockSource("mock2")
+	mRCtx := context.Background()
+	// nRCtx := context.Background()
+
+	mCtx := m.Start(mRCtx)
 
 	//add the mock sources to the news service
 	ns.Add(m)
-	ns.Add(n)
+	// ns.Add(n)
 
 	//go start must only be called when all the sources have been added otherwise it wont work
 	ns.Start()
@@ -35,17 +41,22 @@ func Test_Service_Unit(t *testing.T) {
 		st.body = "Mock 1 Go News " + fmt.Sprint(i)
 		st.catagory = "go"
 
-		go m.Publish(st)
+		go m.Publish(mCtx, st)
 	}
 	//Publish 5 news with mock news 2
-	for i := 0; i <= 5; i++ {
-		st := story{}
-		st.body = "Mock 2 Go News " + fmt.Sprint(i)
-		st.catagory = "go"
+	// for i := 0; i <= 5; i++ {
+	// 	st := story{}
+	// 	st.body = "Mock 2 Go News " + fmt.Sprint(i)
+	// 	st.catagory = "go"
 
-		go n.Publish(st)
-	}
+	// 	go n.Publish(st)
+	// }
 
 	//demo subscriber receives the news and prints it to the terminal
-	ds.Receive(ds.nChl)
+	go ds.Receive(ds.nChl)
+
+	time.Sleep(200 * time.Millisecond)
+
+	m.Stop()
+
 }

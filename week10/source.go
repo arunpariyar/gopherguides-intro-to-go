@@ -1,7 +1,9 @@
 package week10
 
+import "context"
+
 type Source interface {
 	Name() string
-	Publish(story)
+	Publish(context.Context, story)
 	News() chan story
 }
