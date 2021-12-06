@@ -29,14 +29,12 @@ func NewService() *service {
 	return s
 }
 
-func (s *service) Start(ctx context.Context) context.Context {
+func (s *service) Start(ctx context.Context) {
 	ctx, s.cancel = context.WithCancel(ctx)
 
 	for _, ch := range s.src_chl {
 		go s.listen(ctx, ch)
 	}
-
-	return ctx
 }
 
 func (ns *service) Subscribe(s Subscriber) chan news {

@@ -19,24 +19,23 @@ func Test_Service_Unit(t *testing.T) {
 
 	//subscribe to the news service channel (returns channel to listen)
 	ch := ns.Subscribe(ds)
+	// save it the the demo subsriber news channnel
 	ds.nChl = ch
 
-	// save it the the demo subsriber news channnel
 	//Create some Mock Source
 	m := NewMockSource("mock1")
-	// n := NewMockSource("mock2")
-	mRCtx := context.Background()
-	// nRCtx := context.Background()
 
+	//background context for the new mock source
+	mRCtx := context.Background()
+
+	//starting m with the created context
 	mCtx := m.Start(mRCtx)
 
 	//add the mock sources to the news service
 	ns.Add(m)
-	// ns.Add(n)
 
 	//go start must only be called when all the sources have been added otherwise it wont work
-	nsCtx := ns.Start(nsBCtx)
-	fmt.Println(nsCtx)
+	ns.Start(nsBCtx)
 
 	//Publish 10 Stories with mock news 1
 	for i := 0; i <= 10; i++ {
@@ -46,20 +45,16 @@ func Test_Service_Unit(t *testing.T) {
 
 		go m.Publish(mCtx, st)
 	}
-	//Publish 5 news with mock news 2
-	// for i := 0; i <= 5; i++ {
-	// 	st := story{}
-	// 	st.body = "Mock 2 Go News " + fmt.Sprint(i)
-	// 	st.catagory = "go"
-
-	// 	go n.Publish(st)
-	// }
 
 	//demo subscriber receives the news and prints it to the terminal
 	go ds.Receive(ds.nChl)
 
-	time.Sleep(100 * time.Millisecond)
+	//allowing some sleeping time to ensure all go routines get time to complete
+	time.Sleep(5 * time.Millisecond)
 
+	//printing history to check all news are also saved
+	fmt.Println(ns.history)
+
+	//stopping the news service.
 	ns.Stop()
-
 }
