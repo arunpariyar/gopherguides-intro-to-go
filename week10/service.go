@@ -15,7 +15,7 @@ type service struct {
 	Once    sync.Once
 	stopped bool
 	cancel  context.CancelFunc
-	sync.Mutex
+	sync.RWMutex
 }
 
 func NewService() *service {
@@ -29,11 +29,11 @@ func NewService() *service {
 	return s
 }
 
-func (s *service) Start(ctx context.Context) {
-	ctx, s.cancel = context.WithCancel(ctx)
+func (ns *service) Start(ctx context.Context) {
+	ctx, ns.cancel = context.WithCancel(ctx)
 
-	for _, ch := range s.src_chl {
-		go s.listen(ctx, ch)
+	for _, ch := range ns.src_chl {
+		go ns.listen(ctx, ch)
 	}
 }
 
