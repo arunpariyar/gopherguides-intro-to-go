@@ -46,13 +46,14 @@ func (ns *service) Subscribe(s Subscriber) chan news {
 	return ns.sub_chl[s.Name()]
 }
 
-func (ns *service) Add(s Source) {
+func (ns *service) Add(ctx context.Context, s Source) {
 	//error checks must be added later
 	ns.Lock()
 	ns.srcs = append(ns.srcs, s.Name())
 	ns.src_chl[s.Name()] = s.News() // dont save just launch it in a go routine.
 	ns.Unlock()
-
+	
+	go ns.listen(ctx, s.News())
 }
 
 func (ns *service) listen(ctx context.Context, ch chan story) {
