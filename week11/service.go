@@ -38,10 +38,12 @@ func (ns *service) Start(ctx context.Context) {
 }
 
 //trying to remove subscriber all together
-func (ns *service) Subscribe(n string, cs catagories) {
+func (ns *service) Subscribe(n string, cs ...catagory) {
+	cats := make([]catagory,0)
+	cats = append(cats, cs...)
 	//error checks must be added later
 	ns.Lock()
-	ns.subs[n] = cs
+	ns.subs[n] = cats
 	ns.sub_chl[n] = make(chan news)
 	ns.Unlock()
 	//as soon as the subsriber subscribe start publishing news as well // no need to return a channel start displaying news

@@ -18,9 +18,9 @@ func Test_Service_Unit(t *testing.T) {
 	ns.Start(nsBCtx)
 
 	//making a subscriber one 
-	ns.Subscribe("one", []catagory{"ai"})
+	ns.Subscribe("one", "ai", "go")
 	//making a subscriber two
-	ns.Subscribe("two", []catagory{"go"})
+	ns.Subscribe("two", "go")
 
 	//Create some Mock Source
 	mRCtx := context.Background() //background context for the new mock source
