@@ -37,13 +37,25 @@ func (ns *service) Start(ctx context.Context) {
 	}
 }
 
-func (ns *service) Subscribe(s Subscriber) chan news {
+//trying to remove subscriber all together
+func (ns *service) Subscribe(n string, cs catagories) {
 	//error checks must be added later
 	ns.Lock()
-	ns.subs[s.Name()] = s.Catagories()
-	ns.sub_chl[s.Name()] = make(chan news)
+	ns.subs[n] = cs
+	ns.sub_chl[n] = make(chan news)
 	ns.Unlock()
-	return ns.sub_chl[s.Name()]
+	//as soon as the subsriber subscribe start publishing news as well // no need to return a channel start displaying news
+	
+	// This must be lauched as a goroutine or it will block
+	go Listen(ns.sub_chl[n])	
+}
+
+
+// This function will automaticaly start listening to the channel once subscribed.
+func Listen(ch chan news){
+	for news := range ch {
+		 fmt.Println(news)
+	}
 }
 
 func (ns *service) Add(ctx context.Context, s Source) {
@@ -70,8 +82,9 @@ func (ns *service) listen(ctx context.Context, ch chan story) {
 			ns.Publish(news)
 		}(st)
 	}
+
 	<-ctx.Done()
-	fmt.Println("News Service Closing Down")
+	fmt.Println("Source Closing Down")
 }
 
 func (ns *service) Publish(n news) {
@@ -123,3 +136,4 @@ func (ns *service) Stop() {
 	})
 
 }
+

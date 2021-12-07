@@ -17,50 +17,49 @@ func Test_Service_Unit(t *testing.T) {
 	//go start must only be called when all the sources have been added otherwise it wont work
 	ns.Start(nsBCtx)
 
-	//creating a new Demo Subscriber
-	ds := NewDemoSubscriber("demo_subscriber", []catagory{"go", "ai"})
-	//start receiving
-	
+	//making a subscriber one 
+	ns.Subscribe("one", []catagory{"ai"})
+	//making a subscriber two
+	ns.Subscribe("two", []catagory{"go"})
 
-	//subscribe to the news service channel (returns channel to listen)
-	ch := ns.Subscribe(ds)
-	// save it the the demo subsriber news channnel
-	ds.nChl = ch
-	// demo subscriber receives the news and prints it to the terminal
-	go ds.Receive(ds.nChl)
 	//Create some Mock Source
+	mRCtx := context.Background() //background context for the new mock source
 	m := NewMockSource("mock1")
+	mCtx := m.Start(mRCtx) //starting m with the created context
 
-	//background context for the new mock source
-	mRCtx := context.Background()
-
-	//starting m with the created context
-	mCtx := m.Start(mRCtx)
+	ns.Add(mCtx, m) //add the mock sources to the news service
 	
-	
-
-	
-
-	//add the mock sources to the news service
-	// ns.Add(m)
-	ns.Add(mCtx, m)
-
 	// Publish 10 Stories with mock news 1
-	for i := 0; i <= 10; i++ {
+	for i := 1; i <= 10; i++ {
 		st := story{}
-		st.body = "Mock 1 Go News " + fmt.Sprint(i)
+		st.body = "Mock 1 ai News " + fmt.Sprint(i)
 		st.catagory = "ai"
 
 		go m.Publish(mCtx, st)
 	}
 
+	//Create some Mock Source
+	nRCtx := context.Background() //background context for the new mock source
+	n := NewMockSource("mock1")
+	nCtx := n.Start(nRCtx) //starting m with the created context
 
-
+	ns.Add(nCtx, n) //add the mock sources to the news service
 	
+	// Publish 10 Stories with mock news 1
+	for i := 1; i <= 10; i++ {
+		st := story{}
+		st.body = "Mock 2 Go News " + fmt.Sprint(i)
+		st.catagory = "go"
+
+		go n.Publish(mCtx, st)
+	}
 
 	//allowing some sleeping time to ensure all go routines get time to complete
 	time.Sleep(5 * time.Millisecond)
 
+	fmt.Println(ns.subs)
+
 	//stopping the news service.
-	// ns.Stop()
+	// m.Stop()
+	
 }
