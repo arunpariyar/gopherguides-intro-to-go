@@ -27,13 +27,6 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 	}
 
 	return cmd.Main(ctx, pwd, args[1:])
-
-	// fmt.Println("app.Main")
-	// fmt.Println("args:", args)
-	// fmt.Println("pwd:", pwd)
-
-	// <-ctx.Done()
-	// return nil
 }
 
 func (app *App) Usage(w io.Writer) error {

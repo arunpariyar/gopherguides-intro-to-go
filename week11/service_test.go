@@ -40,7 +40,7 @@ func Test_Service_Unit(t *testing.T) {
 
 	//Create some Mock Source
 	nRCtx := context.Background() //background context for the new mock source
-	n := NewMockSource("mock1")
+	n := NewMockSource("mock2")
 	nCtx := n.Start(nRCtx) //starting m with the created context
 
 	ns.Add(nCtx, n) //add the mock sources to the news service
@@ -59,13 +59,14 @@ func Test_Service_Unit(t *testing.T) {
 
 	// fmt.Println(ns.history)
 
-	h := ns.Search(1,2)
+	// res, err := ns.Search(1,2,3,4,5, 500)
 
-	fmt.Println(h)
-
-
+	// fmt.Println(res, err)
 
 	//stopping the news service.
-	// m.Stop()
+	ns.Stop()
+	//clearing the history
+	// ns.Clear()
+	// fmt.Println(ns.history)
 
 }

@@ -2,9 +2,11 @@ package week11
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"sort"
+	"io/ioutil"
 	"sync"
+	"time"
 )
 
 type service struct {
@@ -25,7 +27,7 @@ func NewService() *service {
 		srcs:    make([]string, 0),           //source name and catagories
 		sub_chl: make(map[string]chan news),  // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
 		src_chl: make(map[string]chan story), //a channels to listen from every source for stories
-		history: make(map[int]news, 0),
+		history: make(map[int]news),
 	}
 	return s
 }
@@ -33,9 +35,14 @@ func NewService() *service {
 func (ns *service) Start(ctx context.Context) {
 	ctx, ns.cancel = context.WithCancel(ctx)
 
+	ns.LoadArchive()
+
 	for _, ch := range ns.src_chl {
 		go ns.listen(ctx, ch)
 	}
+
+	go ns.Archive()
+
 }
 
 //trying to remove subscriber all together
@@ -76,9 +83,9 @@ func (ns *service) listen(ctx context.Context, ch chan story) {
 		func(st story) { //not running this as a go routine otherwise it won't get the ids right
 			ns.Lock()
 			news := news{}
-			news.id = len(ns.history) + 1
-			news.body = st.body
-			news.catagory = st.catagory
+			news.Id = len(ns.history) + 1
+			news.Body = st.body
+			news.Catagory = st.catagory
 			ns.Unlock()
 
 			ns.Publish(news)
@@ -92,12 +99,12 @@ func (ns *service) listen(ctx context.Context, ch chan story) {
 func (ns *service) Publish(n news) {
 	//save to history
 	ns.Lock()
-	ns.history[n.id] = n
+	ns.history[n.Id] = n
 	ns.Unlock()
 	//send to the subscrber
 	for sub, cs := range ns.subs {
 		for _, c := range cs {
-			if string(n.catagory) == string(c) {
+			if string(n.Catagory) == string(c) {
 				ns.Lock()
 				ch := ns.sub_chl[sub]
 				ch <- n
@@ -108,6 +115,7 @@ func (ns *service) Publish(n news) {
 }
 
 func (ns *service) Stop() {
+	ns.Backup()
 	ns.cancel()
 	if ns.stopped {
 		return
@@ -138,21 +146,75 @@ func (ns *service) Stop() {
 	})
 
 }
+ //there must be an error case as well.
+func(ns *service)Search(ids ...int) ([]news ,error){
+	if len(ids) == 0 {
+		return nil, fmt.Errorf("no ID's entered")
+	}
+	results := make([]news, 0) 
 
-func(ns *service)Search(ids ...int)[]news {
-	history := make([]news,0)
-	ks := make([]int, 0)
-	ks = append(ks, ids...)
-
-	sort.Ints(ks)
-
-	for i := 0; i <= len(ks)-1; i++ {
-		v, ok := ns.history[ks[i]]
-		if ok {
-			history = append(history, v)
+	for _, id := range ids {
+		ns.Lock()
+		news, ok := ns.history[id]
+		ns.Unlock()
+		
+		if !ok {
+			return nil, fmt.Errorf("couldnt find news with ID: %d", id)
 		}
-
+		ns.Lock()
+		results = append(results, news)
+		ns.Unlock()
 	}
 
-	return history
+	return results, nil
+}
+
+func (ns *service) Backup()error {
+	ns.Lock()
+	bb, err := json.Marshal(ns.history)
+	ns.Unlock()
+
+	if err != nil {
+		return err
+	}
+	ns.Lock()
+	ioutil.WriteFile("./serviceBackup.json", bb, 0644)
+	ns.Unlock()
+	return nil
+}
+
+func (ns *service) Archive() error {
+	for {
+		time.Sleep(2 * time.Millisecond)
+		ns.Backup()
+	}
+}
+
+func (ns *service) LoadArchive() error {
+	bb, err := ioutil.ReadFile("./serviceBackup.json")
+	if err != nil {
+		return err 
+	}
+
+	backup := make(map[int]news)
+
+	err = json.Unmarshal(bb, &backup)
+
+	if err != nil {
+		return err 
+	}
+
+	for key, news := range backup {
+		ns.history[key] = news
+	}
+	return nil
+}
+
+func (ns *service) Clear() {
+	clear := make(map[int]news)
+	ns.Lock()
+	ns.history = clear
+	ns.Unlock()
+
+	ns.Backup()
 }
