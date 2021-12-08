@@ -115,49 +115,48 @@ func (ns *service) Publish(n news) {
 }
 
 func (ns *service) Stop() {
-	ns.Backup()
-	ns.cancel()
+	ns.RLock()
 	if ns.stopped {
+		ns.RLock()
 		return
 	}
-
-	ns.Lock()
-	ns.stopped = true
-	ns.Unlock()
+	ns.RUnlock()
 
 	ns.Once.Do(func() {
+		ns.Backup()
+		ns.Lock()
+		defer ns.Unlock()
+
+		ns.cancel()
+		ns.stopped = true
 		//closing all source channels
 		for _, ch := range ns.src_chl {
 			if ch != nil {
-				ns.Lock()
 				close(ch)
-				ns.Unlock()
 			}
 		}
-
 		//closing all subscribers channels
 		for _, ch := range ns.sub_chl {
 			if ch != nil {
-				ns.Lock()
 				close(ch)
-				ns.Unlock()
 			}
 		}
 	})
 
 }
- //there must be an error case as well.
-func(ns *service)Search(ids ...int) ([]news ,error){
+
+//there must be an error case as well.
+func (ns *service) Search(ids ...int) ([]news, error) {
 	if len(ids) == 0 {
 		return nil, fmt.Errorf("no ID's entered")
 	}
-	results := make([]news, 0) 
+	results := make([]news, 0)
 
 	for _, id := range ids {
 		ns.Lock()
 		news, ok := ns.history[id]
 		ns.Unlock()
-		
+
 		if !ok {
 			return nil, fmt.Errorf("couldnt find news with ID: %d", id)
 		}
@@ -169,7 +168,7 @@ func(ns *service)Search(ids ...int) ([]news ,error){
 	return results, nil
 }
 
-func (ns *service) Backup()error {
+func (ns *service) Backup() error {
 	ns.Lock()
 	bb, err := json.Marshal(ns.history)
 	ns.Unlock()
@@ -193,7 +192,7 @@ func (ns *service) Archive() error {
 func (ns *service) LoadArchive() error {
 	bb, err := ioutil.ReadFile("./serviceBackup.json")
 	if err != nil {
-		return err 
+		return err
 	}
 
 	backup := make(map[int]news)
@@ -201,7 +200,7 @@ func (ns *service) LoadArchive() error {
 	err = json.Unmarshal(bb, &backup)
 
 	if err != nil {
-		return err 
+		return err
 	}
 
 	for key, news := range backup {

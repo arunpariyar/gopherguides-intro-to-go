@@ -55,7 +55,7 @@ func Test_Service_Unit(t *testing.T) {
 	}
 
 	//allowing some sleeping time to ensure all go routines get time to complete
-	time.Sleep(5 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	// fmt.Println(ns.history)
 
@@ -66,7 +66,7 @@ func Test_Service_Unit(t *testing.T) {
 	//stopping the news service.
 	ns.Stop()
 	//clearing the history
-	// ns.Clear()
+	ns.Clear()
 	// fmt.Println(ns.history)
 
 }
