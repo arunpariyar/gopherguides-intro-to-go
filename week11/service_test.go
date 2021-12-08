@@ -38,6 +38,8 @@ func Test_Service_Unit(t *testing.T) {
 		go m.Publish(mCtx, st)
 	}
 
+	m.Stop()
+
 	//Create some Mock Source
 	nRCtx := context.Background() //background context for the new mock source
 	n := NewMockSource("mock2")
@@ -58,7 +60,6 @@ func Test_Service_Unit(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 
 	// fmt.Println(ns.history)
-
 	// res, err := ns.Search(1,2,3,4,5, 500)
 
 	// fmt.Println(res, err)
@@ -67,6 +68,7 @@ func Test_Service_Unit(t *testing.T) {
 	ns.Stop()
 	//clearing the history
 	ns.Clear()
+
 	// fmt.Println(ns.history)
 
 }

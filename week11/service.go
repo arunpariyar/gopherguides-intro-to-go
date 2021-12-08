@@ -129,12 +129,7 @@ func (ns *service) Stop() {
 
 		ns.cancel()
 		ns.stopped = true
-		//closing all source channels
-		for _, ch := range ns.src_chl {
-			if ch != nil {
-				close(ch)
-			}
-		}
+
 		//closing all subscribers channels
 		for _, ch := range ns.sub_chl {
 			if ch != nil {
