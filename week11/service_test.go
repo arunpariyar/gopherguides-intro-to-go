@@ -18,7 +18,7 @@ func Test_Service_Unit(t *testing.T) {
 	ns.Start(nsBCtx)
 
 	//making a subscriber one 
-	ns.Subscribe("one", "ai", "go")
+	ns.Subscribe("one", "ai")
 	//making a subscriber two
 	ns.Subscribe("two", "go")
 
