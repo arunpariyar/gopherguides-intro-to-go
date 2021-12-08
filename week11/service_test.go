@@ -17,7 +17,7 @@ func Test_Service_Unit(t *testing.T) {
 	//go start must only be called when all the sources have been added otherwise it wont work
 	ns.Start(nsBCtx)
 
-	//making a subscriber one 
+	//making a subscriber one
 	ns.Subscribe("one", "ai")
 	//making a subscriber two
 	ns.Subscribe("two", "go")
@@ -28,7 +28,7 @@ func Test_Service_Unit(t *testing.T) {
 	mCtx := m.Start(mRCtx) //starting m with the created context
 
 	ns.Add(mCtx, m) //add the mock sources to the news service
-	
+
 	// Publish 10 Stories with mock news 1
 	for i := 1; i <= 10; i++ {
 		st := story{}
@@ -44,7 +44,7 @@ func Test_Service_Unit(t *testing.T) {
 	nCtx := n.Start(nRCtx) //starting m with the created context
 
 	ns.Add(nCtx, n) //add the mock sources to the news service
-	
+
 	// Publish 10 Stories with mock news 1
 	for i := 1; i <= 10; i++ {
 		st := story{}
@@ -61,5 +61,5 @@ func Test_Service_Unit(t *testing.T) {
 
 	//stopping the news service.
 	// m.Stop()
-	
+
 }
