@@ -3,6 +3,7 @@ package week11
 import (
 	"context"
 	"fmt"
+	"sort"
 	"sync"
 )
 
@@ -11,7 +12,7 @@ type service struct {
 	srcs    []string
 	sub_chl map[string]chan news
 	src_chl map[string]chan story
-	history []news
+	history map[int]news
 	Once    sync.Once
 	stopped bool
 	cancel  context.CancelFunc
@@ -24,7 +25,7 @@ func NewService() *service {
 		srcs:    make([]string, 0),           //source name and catagories
 		sub_chl: make(map[string]chan news),  // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
 		src_chl: make(map[string]chan story), //a channels to listen from every source for stories
-		history: make([]news, 0),
+		history: make(map[int]news, 0),
 	}
 	return s
 }
@@ -91,7 +92,7 @@ func (ns *service) listen(ctx context.Context, ch chan story) {
 func (ns *service) Publish(n news) {
 	//save to history
 	ns.Lock()
-	ns.history = append(ns.history, n)
+	ns.history[n.id] = n
 	ns.Unlock()
 	//send to the subscrber
 	for sub, cs := range ns.subs {
@@ -136,4 +137,22 @@ func (ns *service) Stop() {
 		}
 	})
 
+}
+
+func(ns *service)Search(ids ...int)[]news {
+	history := make([]news,0)
+	ks := make([]int, 0)
+	ks = append(ks, ids...)
+
+	sort.Ints(ks)
+
+	for i := 0; i <= len(ks)-1; i++ {
+		v, ok := ns.history[ks[i]]
+		if ok {
+			history = append(history, v)
+		}
+
+	}
+
+	return history
 }

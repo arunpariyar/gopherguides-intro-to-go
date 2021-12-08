@@ -17,3 +17,10 @@ func (oi IO) Stdout() io.Writer {
 	}
 	return oi.Out
 }
+
+func (oi IO) Stdin() io.Reader {
+	if oi.In == nil {
+		return os.Stdin
+	}
+	return oi.In
+}

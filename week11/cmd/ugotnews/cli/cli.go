@@ -4,18 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 )
 
-func (oi IO) Stdin() io.Reader {
-	if oi.In == nil {
-		return os.Stdin
-	}
-	return oi.In
-}
-
 type App struct {
-	IO
+	IO //embedded IO to allow IO instead of std io
+	Commands map[string]Commander
 }
 
 func (app *App) Main(ctx context.Context, pwd string, args []string) error {
@@ -28,12 +21,19 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 		return app.Usage(app.Stdout())
 	}
 
-	fmt.Println("app.Main")
-	fmt.Println("args:", args)
-	fmt.Println("pwd:", pwd)
+	cmd, ok := app.Commands[args[0]]
+	if !ok {
+		return fmt.Errorf("command %q not found", args[0])
+	}
 
-	<-ctx.Done()
-	return nil
+	return cmd.Main(ctx, pwd, args[1:])
+
+	// fmt.Println("app.Main")
+	// fmt.Println("args:", args)
+	// fmt.Println("pwd:", pwd)
+
+	// <-ctx.Done()
+	// return nil
 }
 
 func (app *App) Usage(w io.Writer) error {
