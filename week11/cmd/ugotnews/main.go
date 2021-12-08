@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"week11/cmd/ugotnews/cli"
 )
 
 func main(){
@@ -28,7 +29,7 @@ func main(){
 
 	app := &cli.App{}
 
-	err := app.Main(ctx, pwd, os.Args[1:])
+	err = app.Main(ctx, pwd, os.Args[1:])
 
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
