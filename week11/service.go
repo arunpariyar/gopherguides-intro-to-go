@@ -21,22 +21,21 @@ type service struct {
 	sync.RWMutex
 }
 
-//To unsubscribe from the service
-func (ns *service) UnSubscribe(s string) error {
-
-	//return not found if not found
-	for name, _ := range ns.subs {
-		if s == name {
-
-			ns.Lock()
-			delete(ns.subs, s)
-			delete(ns.sub_chl, s)
-			ns.Unlock()
-			fmt.Printf("%s has unsubscribed \n", s)
-			return nil
-		}
+//remove a source
+func (ns *service) Remove(ctx context.Context, s Source) error {
+	ok, index := Contains(ns.srcs, s.Name())
+	if !ok {
+		return fmt.Errorf("%v is not a Source", s.Name())
 	}
-	return fmt.Errorf("%#v subscriber not found in subscription", s)
+	_, cancel := context.WithCancel(ctx)
+	cancel()
+
+	ns.Lock()
+	ns.srcs = RemoveIndex(ns.srcs, index) //remove from ns.srcs
+	delete(ns.src_chl, s.Name())          //remove from src.chl
+	ns.Unlock()
+
+	return nil
 }
 
 func NewService() *service {
@@ -58,7 +57,7 @@ func (ns *service) Start(ctx context.Context) {
 	for _, ch := range ns.src_chl {
 		go ns.listen(ctx, ch)
 	}
-
+	// this will archive the history every 2 seconds
 	go ns.Archive()
 
 }
@@ -76,6 +75,24 @@ func (ns *service) Subscribe(n string, cs ...catagory) {
 
 	// This must be lauched as a goroutine or it will block
 	go Listen(ns.sub_chl[n])
+}
+
+//To unsubscribe from the service
+func (ns *service) UnSubscribe(s string) error {
+
+	//return not found if not found
+	for name, _ := range ns.subs {
+		if s == name {
+
+			ns.Lock()
+			delete(ns.subs, s)
+			delete(ns.sub_chl, s)
+			ns.Unlock()
+			fmt.Printf("%s has unsubscribed \n", s)
+			return nil
+		}
+	}
+	return fmt.Errorf("%#v subscriber not found in subscription", s)
 }
 
 // This function will automaticaly start listening to the channel once subscribed.
@@ -230,4 +247,17 @@ func (ns *service) Clear() {
 	ns.Unlock()
 
 	ns.Backup()
+}
+
+func Contains(srcs []string, src string) (bool, int) {
+	for i, v := range srcs {
+		if v == src {
+			return true, i
+		}
+	}
+	return false, 0
+}
+
+func RemoveIndex(s []string, index int) []string {
+	return append(s[:index], s[index+1:]...)
 }

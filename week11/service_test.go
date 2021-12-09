@@ -38,10 +38,11 @@ func Test_Service_Unit(t *testing.T) {
 		go m.Publish(mCtx, st)
 	}
 
-	err := ns.UnSubscribe("two")
-	if err != nil {
-		fmt.Println(err)
-	}
+	//Unsubscribing two
+	// err := ns.UnSubscribe("two")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
 	//Create some Mock Source
 	nRCtx := context.Background() //background context for the new mock source
@@ -49,9 +50,8 @@ func Test_Service_Unit(t *testing.T) {
 	nCtx := n.Start(nRCtx) //starting m with the created context
 
 	ns.Add(nCtx, n) //add the mock sources to the news service
-
 	// Publish 10 Stories with mock news 1
-	for i := 1; i <= 10; i++ {
+	for i := 1; i <= 20; i++ {
 		st := story{}
 		st.body = "Mock 2 Go News " + fmt.Sprint(i)
 		st.catagory = "go"
@@ -59,8 +59,15 @@ func Test_Service_Unit(t *testing.T) {
 		go n.Publish(mCtx, st)
 	}
 
+	err := ns.Remove(nCtx, n)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(ns.srcs, ns.src_chl)
+
 	//allowing some sleeping time to ensure all go routines get time to complete
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 
 	// fmt.Println(ns.history)
 	// res, err := ns.Search(1,2,3,4,5, 500)
