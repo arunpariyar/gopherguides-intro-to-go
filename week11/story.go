@@ -1,6 +1,8 @@
 package week11
 
 type story struct {
-	body     string
-	catagory string
+	Body     string `json:"body"`
+	Catagory string `json:"catagory"`
 }
+
+type stories []story

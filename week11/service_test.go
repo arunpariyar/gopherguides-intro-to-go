@@ -23,20 +23,20 @@ func Test_Service_Unit(t *testing.T) {
 	ns.Subscribe("two", "go")
 
 	//Create some Mock Source
-	mRCtx := context.Background() //background context for the new mock source
-	m := NewMockSource("mock1")
-	mCtx := m.Start(mRCtx) //starting m with the created context
+	// mRCtx := context.Background() //background context for the new mock source
+	// m := NewMockSource("mock1")
+	// mCtx := m.Start(mRCtx) //starting m with the created context
 
-	ns.Add(mCtx, m) //add the mock sources to the news service
+	// ns.Add(mCtx, m) //add the mock sources to the news service
 
-	// Publish 10 Stories with mock news 1
-	for i := 1; i <= 10; i++ {
-		st := story{}
-		st.body = "Mock 1 ai News " + fmt.Sprint(i)
-		st.catagory = "ai"
+	// // Publish 10 Stories with mock news 1
+	// for i := 1; i <= 10; i++ {
+	// 	st := story{}
+	// 	st.body = "Mock 1 ai News " + fmt.Sprint(i)
+	// 	st.catagory = "ai"
 
-		go m.Publish(mCtx, st)
-	}
+	// 	go m.Publish(mCtx, st)
+	// }
 
 	//Unsubscribing two
 	// err := ns.UnSubscribe("two")
@@ -46,23 +46,25 @@ func Test_Service_Unit(t *testing.T) {
 
 	//Create some Mock Source
 	nRCtx := context.Background() //background context for the new mock source
-	n := NewMockSource("mock2")
+	n := NewFileSource("stories")
 	nCtx := n.Start(nRCtx) //starting m with the created context
 
 	ns.Add(nCtx, n) //add the mock sources to the news service
 	// Publish 10 Stories with mock news 1
-	for i := 1; i <= 20; i++ {
-		st := story{}
-		st.body = "Mock 2 Go News " + fmt.Sprint(i)
-		st.catagory = "go"
-
-		go n.Publish(mCtx, st)
-	}
-
-	err := ns.Remove(nCtx, n)
+	stories, err := n.LoadFile()
 	if err != nil {
 		fmt.Println(err)
 	}
+	for _, st := range stories {
+		go n.Publish(nRCtx, st)
+	}
+
+	n.Stop()
+
+	// // err := ns.Remove(nCtx, n)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
 	fmt.Println(ns.srcs, ns.src_chl)
 

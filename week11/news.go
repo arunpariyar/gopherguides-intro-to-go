@@ -1,7 +1,7 @@
 package week11
 
 type news struct {
-	Id       int
-	Body     string
-	Catagory string
+	Id       int    `json:"id"`
+	Body     string `json:"body"`
+	Catagory string `json:"catagory"`
 }

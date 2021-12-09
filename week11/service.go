@@ -106,7 +106,7 @@ func (ns *service) Add(ctx context.Context, s Source) {
 	//error checks must be added later
 	ns.Lock()
 	ns.srcs = append(ns.srcs, s.Name())
-	ns.src_chl[s.Name()] = s.News() // dont save just launch it in a go routine.
+	ns.src_chl[s.Name()] = s.News() 
 	ns.Unlock()
 	go ns.listen(ctx, s.News())
 }
@@ -118,8 +118,8 @@ func (ns *service) listen(ctx context.Context, ch chan story) {
 			ns.Lock()
 			news := news{}
 			news.Id = len(ns.history) + 1
-			news.Body = st.body
-			news.Catagory = st.catagory
+			news.Body = st.Body
+			news.Catagory = st.Catagory
 			ns.Unlock()
 
 			ns.Publish(news)

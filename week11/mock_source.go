@@ -19,7 +19,6 @@ func NewMockSource(s string) *MockSource {
 	ms := &MockSource{
 		name: s,
 		news: make(chan story),
-		// stopped: false,
 	}
 	return ms
 }
@@ -44,7 +43,7 @@ func (ms *MockSource) Publish(ctx context.Context, s story) {
 
 	<-ctx.Done()
 
-	fmt.Println("Closing mock service news channel")
+	fmt.Println("Closing mock service channel")
 }
 
 func (ms *MockSource) News() chan story {
