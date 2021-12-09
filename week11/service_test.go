@@ -2,7 +2,6 @@ package week11
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 )
@@ -51,22 +50,13 @@ func Test_Service_Unit(t *testing.T) {
 
 	ns.Add(nCtx, n) //add the mock sources to the news service
 	// Publish 10 Stories with mock news 1
-	stories, err := n.LoadFile()
-	if err != nil {
-		fmt.Println(err)
-	}
-	for _, st := range stories {
-		go n.Publish(nRCtx, st)
-	}
 
-	n.Stop()
+	go n.PublishStories()
 
 	// // err := ns.Remove(nCtx, n)
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
-
-	fmt.Println(ns.srcs, ns.src_chl)
 
 	//allowing some sleeping time to ensure all go routines get time to complete
 	time.Sleep(5 * time.Millisecond)

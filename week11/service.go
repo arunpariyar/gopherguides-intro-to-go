@@ -106,7 +106,7 @@ func (ns *service) Add(ctx context.Context, s Source) {
 	//error checks must be added later
 	ns.Lock()
 	ns.srcs = append(ns.srcs, s.Name())
-	ns.src_chl[s.Name()] = s.News() 
+	ns.src_chl[s.Name()] = s.News()
 	ns.Unlock()
 	go ns.listen(ctx, s.News())
 }

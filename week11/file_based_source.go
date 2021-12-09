@@ -46,6 +46,22 @@ func (nfs *FileSource) Publish(ctx context.Context, s story) {
 	fmt.Println("Closing file service channel")
 }
 
+func (nfs *FileSource) PublishStories() error {
+	stories, err := nfs.LoadFile()
+	if err != nil {
+		return err
+	}
+	if !nfs.stopped {
+		for _, story := range stories {
+			nfs.RLock()
+			nfs.news <- story
+			nfs.RUnlock()
+		}
+	}
+	return nil
+
+}
+
 func (nfs *FileSource) News() chan story {
 	return nfs.news
 }
