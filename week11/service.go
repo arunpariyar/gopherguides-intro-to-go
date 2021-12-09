@@ -21,6 +21,24 @@ type service struct {
 	sync.RWMutex
 }
 
+//To unsubscribe from the service
+func (ns *service) UnSubscribe(s string) error {
+
+	//return not found if not found
+	for name, _ := range ns.subs {
+		if s == name {
+
+			ns.Lock()
+			delete(ns.subs, s)
+			delete(ns.sub_chl, s)
+			ns.Unlock()
+			fmt.Printf("%s has unsubscribed \n", s)
+			return nil
+		}
+	}
+	return fmt.Errorf("%#v subscriber not found in subscription", s)
+}
+
 func NewService() *service {
 	s := &service{
 		subs:    make(map[string]catagories), //subscriber name and news catagories
@@ -73,7 +91,6 @@ func (ns *service) Add(ctx context.Context, s Source) {
 	ns.srcs = append(ns.srcs, s.Name())
 	ns.src_chl[s.Name()] = s.News() // dont save just launch it in a go routine.
 	ns.Unlock()
-
 	go ns.listen(ctx, s.News())
 }
 
@@ -101,17 +118,19 @@ func (ns *service) Publish(n news) {
 	ns.Lock()
 	ns.history[n.Id] = n
 	ns.Unlock()
+
+	ns.RLock()
+	defer ns.RUnlock()
 	//send to the subscrber
 	for sub, cs := range ns.subs {
 		for _, c := range cs {
 			if string(n.Catagory) == string(c) {
-				ns.Lock()
 				ch := ns.sub_chl[sub]
 				ch <- n
-				ns.Unlock()
 			}
 		}
 	}
+
 }
 
 func (ns *service) Stop() {

@@ -38,7 +38,10 @@ func Test_Service_Unit(t *testing.T) {
 		go m.Publish(mCtx, st)
 	}
 
-	m.Stop()
+	err := ns.UnSubscribe("two")
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	//Create some Mock Source
 	nRCtx := context.Background() //background context for the new mock source
@@ -65,9 +68,9 @@ func Test_Service_Unit(t *testing.T) {
 	// fmt.Println(res, err)
 
 	//stopping the news service.
-	ns.Stop()
+	// ns.Stop()
 	//clearing the history
-	ns.Clear()
+	// ns.Clear()
 
 	// fmt.Println(ns.history)
 
