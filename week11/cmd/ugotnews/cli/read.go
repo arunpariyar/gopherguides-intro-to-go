@@ -1,36 +1,46 @@
+package cli
+
+import (
+	"context"
+	"fmt"
+	"strconv"
+	"week11"
+)
+
 type ReadCmd struct {
 	IO
-	ID int
-	DB string	//location of backup
-	News *news
+	Name 	string
+	DB   	string
+	Service	*week11.Service
 }
 
 
 func (cmd *ReadCmd)Main(ctx context.Context, pwd string, args []string)error{
-	if err := cmd.init(pwd); err != nil {
-		return err
-	}
-
-	return cmd.print(cmd.News)
-}
-
-func(cmd *ReadCmd) init(pwd string) error {
-	if cmd.News == nil {
-		cmd.News = &service.News{}
-	}
-
-	if cmd.DB == "" {
-		cmd.DB = "news.json"
-	}
-
-	err:= OpenNews(filepath.Join(pwd, cmd.DB), cmd.News)
-	if err != nil{
-		return err
-	} 
-	
+	cmd.init(args)
 	return nil
 }
 
-func OpenNews(path string, news *service.News)error{
+func(cmd *ReadCmd)init(args []string) error {
+	if cmd.Service == nil {
+		cmd.Service = week11.NewService()
+	}
+	keys := make([]int,0)
+
+	for _, v := range args{
+		i, _ := strconv.Atoi(v)
+	 keys = append(keys, i)
+	}
+	
+	cmd.Service.Start(context.Background())
+	
+	news, err := cmd.Service.Search(keys...)
+	if err != nil {
+		return err 
+	}
+	for _, n := range news {
+		fmt.Println(n)
+	}
+	return nil 
 
 }
+

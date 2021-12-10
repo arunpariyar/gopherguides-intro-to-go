@@ -9,7 +9,7 @@ import (
 	"week11/cmd/ugotnews/cli"
 )
 
-func main(){
+func main() {
 	//start a base context for the main
 	ctx := context.Background()
 	//intergrate cancel on interrupt ie. ctrl+c

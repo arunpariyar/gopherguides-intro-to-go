@@ -21,6 +21,14 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 		return app.Usage(app.Stdout())
 	}
 
+	if app.Commands == nil {
+		app.Commands = map[string]Commander{
+			"search":&ReadCmd{
+				Name: "search",
+			},
+		}
+	}
+
 	cmd, ok := app.Commands[args[0]]
 	if !ok {
 		return fmt.Errorf("command %q not found", args[0])

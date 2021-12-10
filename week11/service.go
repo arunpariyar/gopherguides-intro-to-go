@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type service struct {
+type Service struct {
 	subs    map[string]catagories
 	srcs    []string
 	sub_chl map[string]chan news
@@ -21,25 +21,10 @@ type service struct {
 	sync.RWMutex
 }
 
-//remove a source
-func (ns *service) Remove(ctx context.Context, s Source) error {
-	ok, index := Contains(ns.srcs, s.Name())
-	if !ok {
-		return fmt.Errorf("%v is not a Source", s.Name())
-	}
-	_, cancel := context.WithCancel(ctx)
-	cancel()
 
-	ns.Lock()
-	ns.srcs = RemoveIndex(ns.srcs, index) //remove from ns.srcs
-	delete(ns.src_chl, s.Name())          //remove from src.chl
-	ns.Unlock()
 
-	return nil
-}
-
-func NewService() *service {
-	s := &service{
+func NewService() *Service {
+	s := &Service{
 		subs:    make(map[string]catagories), //subscriber name and news catagories
 		srcs:    make([]string, 0),           //source name and catagories
 		sub_chl: make(map[string]chan news),  // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
@@ -49,7 +34,7 @@ func NewService() *service {
 	return s
 }
 
-func (ns *service) Start(ctx context.Context) {
+func (ns *Service) Start(ctx context.Context) {
 	ctx, ns.cancel = context.WithCancel(ctx)
 
 	ns.LoadArchive()
@@ -63,7 +48,7 @@ func (ns *service) Start(ctx context.Context) {
 }
 
 //trying to remove subscriber all together
-func (ns *service) Subscribe(n string, cs ...catagory) {
+func (ns *Service) Subscribe(n string, cs ...catagory) {
 	cats := make([]catagory, 0)
 	cats = append(cats, cs...)
 	//error checks must be added later
@@ -77,8 +62,8 @@ func (ns *service) Subscribe(n string, cs ...catagory) {
 	go Listen(ns.sub_chl[n])
 }
 
-//To unsubscribe from the service
-func (ns *service) UnSubscribe(s string) error {
+//To unsubscribe from the Service
+func (ns *Service) UnSubscribe(s string) error {
 
 	//return not found if not found
 	for name, _ := range ns.subs {
@@ -102,7 +87,7 @@ func Listen(ch chan news) {
 	}
 }
 
-func (ns *service) Add(ctx context.Context, s Source) {
+func (ns *Service) Add(ctx context.Context, s Source) {
 	//error checks must be added later
 	ns.Lock()
 	ns.srcs = append(ns.srcs, s.Name())
@@ -111,7 +96,24 @@ func (ns *service) Add(ctx context.Context, s Source) {
 	go ns.listen(ctx, s.News())
 }
 
-func (ns *service) listen(ctx context.Context, ch chan story) {
+//remove a source
+func (ns *Service) Remove(ctx context.Context, s Source) error {
+	ok, index := Contains(ns.srcs, s.Name())
+	if !ok {
+		return fmt.Errorf("%v is not a Source", s.Name())
+	}
+	_, cancel := context.WithCancel(ctx)
+	cancel()
+
+	ns.Lock()
+	ns.srcs = RemoveIndex(ns.srcs, index) //remove from ns.srcs
+	delete(ns.src_chl, s.Name())          //remove from src.chl
+	ns.Unlock()
+
+	return nil
+}
+
+func (ns *Service) listen(ctx context.Context, ch chan story) {
 	// convert story to news
 	for st := range ch {
 		func(st story) { //not running this as a go routine otherwise it won't get the ids right
@@ -130,7 +132,7 @@ func (ns *service) listen(ctx context.Context, ch chan story) {
 	fmt.Println("Source Closing Down")
 }
 
-func (ns *service) Publish(n news) {
+func (ns *Service) Publish(n news) {
 	//save to history
 	ns.Lock()
 	ns.history[n.Id] = n
@@ -150,7 +152,7 @@ func (ns *service) Publish(n news) {
 
 }
 
-func (ns *service) Stop() {
+func (ns *Service) Stop() {
 	ns.RLock()
 	if ns.stopped {
 		ns.RLock()
@@ -177,7 +179,7 @@ func (ns *service) Stop() {
 }
 
 //there must be an error case as well.
-func (ns *service) Search(ids ...int) ([]news, error) {
+func (ns *Service) Search(ids ...int) ([]news, error) {
 	if len(ids) == 0 {
 		return nil, fmt.Errorf("no ID's entered")
 	}
@@ -199,7 +201,7 @@ func (ns *service) Search(ids ...int) ([]news, error) {
 	return results, nil
 }
 
-func (ns *service) Backup() error {
+func (ns *Service) Backup() error {
 	ns.Lock()
 	bb, err := json.Marshal(ns.history)
 	ns.Unlock()
@@ -213,14 +215,14 @@ func (ns *service) Backup() error {
 	return nil
 }
 
-func (ns *service) Archive() error {
+func (ns *Service) Archive() error {
 	for {
 		time.Sleep(2 * time.Millisecond)
 		ns.Backup()
 	}
 }
 
-func (ns *service) LoadArchive() error {
+func (ns *Service) LoadArchive() error {
 	bb, err := ioutil.ReadFile("./serviceBackup.json")
 	if err != nil {
 		return err
@@ -240,7 +242,7 @@ func (ns *service) LoadArchive() error {
 	return nil
 }
 
-func (ns *service) Clear() {
+func (ns *Service) Clear() {
 	clear := make(map[int]news)
 	ns.Lock()
 	ns.history = clear
