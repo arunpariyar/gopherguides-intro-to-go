@@ -12,24 +12,22 @@ import (
 type Service struct {
 	subs    map[string]catagories
 	srcs    []string
-	sub_chl map[string]chan news
+	sub_chl map[string]chan News
 	src_chl map[string]chan story
-	history map[int]news
+	history map[int]News
 	Once    sync.Once
 	stopped bool
 	cancel  context.CancelFunc
 	sync.RWMutex
 }
 
-
-
 func NewService() *Service {
 	s := &Service{
 		subs:    make(map[string]catagories), //subscriber name and news catagories
 		srcs:    make([]string, 0),           //source name and catagories
-		sub_chl: make(map[string]chan news),  // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
+		sub_chl: make(map[string]chan News),  // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
 		src_chl: make(map[string]chan story), //a channels to listen from every source for stories
-		history: make(map[int]news),
+		history: make(map[int]News),
 	}
 	return s
 }
@@ -54,7 +52,7 @@ func (ns *Service) Subscribe(n string, cs ...catagory) {
 	//error checks must be added later
 	ns.Lock()
 	ns.subs[n] = cats
-	ns.sub_chl[n] = make(chan news)
+	ns.sub_chl[n] = make(chan News)
 	ns.Unlock()
 	//as soon as the subsriber subscribe start publishing news as well // no need to return a channel start displaying news
 
@@ -81,7 +79,7 @@ func (ns *Service) UnSubscribe(s string) error {
 }
 
 // This function will automaticaly start listening to the channel once subscribed.
-func Listen(ch chan news) {
+func Listen(ch chan News) {
 	for news := range ch {
 		fmt.Println(news)
 	}
@@ -118,7 +116,7 @@ func (ns *Service) listen(ctx context.Context, ch chan story) {
 	for st := range ch {
 		func(st story) { //not running this as a go routine otherwise it won't get the ids right
 			ns.Lock()
-			news := news{}
+			news := News{}
 			news.Id = len(ns.history) + 1
 			news.Body = st.Body
 			news.Catagory = st.Catagory
@@ -132,7 +130,7 @@ func (ns *Service) listen(ctx context.Context, ch chan story) {
 	fmt.Println("Source Closing Down")
 }
 
-func (ns *Service) Publish(n news) {
+func (ns *Service) Publish(n News) {
 	//save to history
 	ns.Lock()
 	ns.history[n.Id] = n
@@ -179,11 +177,11 @@ func (ns *Service) Stop() {
 }
 
 //there must be an error case as well.
-func (ns *Service) Search(ids ...int) ([]news, error) {
+func (ns *Service) Search(ids ...int) ([]News, error) {
 	if len(ids) == 0 {
 		return nil, fmt.Errorf("no ID's entered")
 	}
-	results := make([]news, 0)
+	results := make([]News, 0)
 
 	for _, id := range ids {
 		ns.Lock()
@@ -217,7 +215,7 @@ func (ns *Service) Backup() error {
 
 func (ns *Service) Archive() error {
 	for {
-		time.Sleep(2 * time.Millisecond)
+		time.Sleep(4 * time.Millisecond)
 		ns.Backup()
 	}
 }
@@ -228,7 +226,7 @@ func (ns *Service) LoadArchive() error {
 		return err
 	}
 
-	backup := make(map[int]news)
+	backup := make(map[int]News)
 
 	err = json.Unmarshal(bb, &backup)
 
@@ -243,7 +241,7 @@ func (ns *Service) LoadArchive() error {
 }
 
 func (ns *Service) Clear() {
-	clear := make(map[int]news)
+	clear := make(map[int]News)
 	ns.Lock()
 	ns.history = clear
 	ns.Unlock()

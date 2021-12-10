@@ -23,8 +23,8 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 
 	if app.Commands == nil {
 		app.Commands = map[string]Commander{
-			"search":&ReadCmd{
-				Name: "search",
+			"read":&ReadCmd{
+				Name: "read",
 			},
 		}
 	}
@@ -32,6 +32,10 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 	cmd, ok := app.Commands[args[0]]
 	if !ok {
 		return fmt.Errorf("command %q not found", args[0])
+	}
+
+	if ioc, ok := cmd.(IOCommander); ok {
+		ioc.SetIO(app.IO)
 	}
 
 	return cmd.Main(ctx, pwd, args[1:])
