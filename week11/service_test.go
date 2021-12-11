@@ -51,7 +51,7 @@ func Test_Service_Unit(t *testing.T) {
 	ns.Add(nCtx, n) //add the mock sources to the news service
 	// Publish 10 Stories with mock news 1
 
-	go n.PublishStories()
+	n.PublishStories()
 
 	// // err := ns.Remove(nCtx, n)
 	// if err != nil {

@@ -51,12 +51,11 @@ func (cmd *ReadCmd) SetIO(oi IO){
 }
 
 func(cmd *ReadCmd)init(pwd string, args []string) error {
-	index := len(args)
+	//seperates arguments by commas
 	cleanArgs := make([]string,0)
-	for i:=0; i<index; i++{
-		ss := strings.Split(args[i], ",")
-		cleanArgs = append(cleanArgs, ss...)
-	}
+	ss := strings.Split(args[0], ", ")
+	cleanArgs = append(cleanArgs, ss...)
+	fmt.Println(cleanArgs)
 	
 	if err := cmd.Flags().Parse(cleanArgs); err != nil {
 		return err
@@ -64,9 +63,8 @@ func(cmd *ReadCmd)init(pwd string, args []string) error {
 
 	if cmd.Service == nil {
 		cmd.Service = week11.NewService()
-		
 	}
-	
+		
 	keys := make([]int,0)
 
 	for _, v := range cleanArgs{

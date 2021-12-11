@@ -29,6 +29,9 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 			"clear":&ClearCmd{
 				Name: "clear",
 			},
+			"stream":&StreamCmd{
+				Name: "stream",
+			},
 		}
 	}
 	

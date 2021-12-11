@@ -10,7 +10,7 @@ import (
 )
 
 type Service struct {
-	subs    map[string]catagories
+	subs    map[string]Catagories
 	srcs    []string
 	sub_chl map[string]chan News
 	src_chl map[string]chan story
@@ -23,7 +23,7 @@ type Service struct {
 
 func NewService() *Service {
 	s := &Service{
-		subs:    make(map[string]catagories), //subscriber name and news catagories
+		subs:    make(map[string]Catagories), //subscriber name and news catagories
 		srcs:    make([]string, 0),           //source name and catagories
 		sub_chl: make(map[string]chan News),  // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
 		src_chl: make(map[string]chan story), //a channels to listen from every source for stories
@@ -34,7 +34,6 @@ func NewService() *Service {
 
 func (ns *Service) Start(ctx context.Context) {
 	ctx, ns.cancel = context.WithCancel(ctx)
-
 	ns.LoadArchive()
 
 	for _, ch := range ns.src_chl {
@@ -46,8 +45,8 @@ func (ns *Service) Start(ctx context.Context) {
 }
 
 //trying to remove subscriber all together
-func (ns *Service) Subscribe(n string, cs ...catagory) {
-	cats := make([]catagory, 0)
+func (ns *Service) Subscribe(n string, cs ...Catagory) {
+	cats := make([]Catagory, 0)
 	cats = append(cats, cs...)
 	//error checks must be added later
 	ns.Lock()

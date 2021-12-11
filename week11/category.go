@@ -1,4 +1,4 @@
 package week11
 
-type catagory string
-type catagories []catagory
+type Catagory string
+type Catagories []Catagory

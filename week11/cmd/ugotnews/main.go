@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"time"
 	"week11/cmd/ugotnews/cli"
+	// "week11/cmd/ugotnews/cli"
 )
 
 func main() {

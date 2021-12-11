@@ -57,9 +57,7 @@ func (cmd *ClearCmd) init(pwd string, args []string) error {
 	cmd.Service.Add(context.Background(),nfs)
 	//publishing stories in a go routine
 	nfs.PublishStories()
-
 	cmd.Service.Clear()
-
 	// fmt.Println(pwd, args, cmd.DB)
 	return nil 
 	
