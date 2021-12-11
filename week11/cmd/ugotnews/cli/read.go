@@ -2,9 +2,14 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"week11"
 )
 
@@ -21,10 +26,7 @@ type ReadCmd struct {
 }
 
 func (cmd *ReadCmd) Flags() *flag.FlagSet {
-	if len(cmd.DB) == 0 {
-		cmd.DB = "news.json"
-	} 
-
+	
 	if cmd.flags != nil {
 		return cmd.flags
 	}
@@ -49,24 +51,31 @@ func (cmd *ReadCmd) SetIO(oi IO){
 }
 
 func(cmd *ReadCmd)init(pwd string, args []string) error {
-	
-	if cmd.DB == "" {
-		cmd.DB = "news.json"
+	index := len(args)
+	cleanArgs := make([]string,0)
+	for i:=0; i<index; i++{
+		ss := strings.Split(args[i], ",")
+		cleanArgs = append(cleanArgs, ss...)
 	}
+		
 
-	if err := cmd.Flags().Parse(args); err != nil {
+	if err := cmd.Flags().Parse(cleanArgs); err != nil {
 		return err
 	}
-	
+
 	if cmd.Service == nil {
 		cmd.Service = week11.NewService()
+		
 	}
 	
 	keys := make([]int,0)
 
-	for _, v := range args{
+	for _, v := range cleanArgs{
 		i, _ := strconv.Atoi(v)
-	 keys = append(keys, i)
+		if i != 0{
+			keys = append(keys, i)
+		}
+	 
 	}
 	
 	cmd.Service.Start(context.Background())
@@ -78,14 +87,50 @@ func(cmd *ReadCmd)init(pwd string, args []string) error {
 	nfs.PublishStories()
 	
 	news, err := cmd.Service.Search(keys...)
-
 	if err != nil {
 		return err 
 	}
+
+	if (len(cmd.Output) > 0) && (cmd.DB != "") {
+		
+		os.MkdirAll(filepath.Dir(cmd.DB), 0755)
+		
+		bb, err := json.Marshal(news)
+		if err != nil {
+			
+			return err
+		}
+		
+		ioutil.WriteFile(cmd.DB, bb, 0644)
+		return nil
+	}
 	
-	// if cmd.JSON {
-	// 	return json.NewEncoder(cmd.Stdout()).Encode(news)
-	// }
+	if len(cmd.Output) > 0 {
+		os.MkdirAll(filepath.Dir(cmd.Output), 0755)
+		bb, err := json.Marshal(news)
+		if err != nil {
+			return err
+		}
+		ioutil.WriteFile(cmd.Output, bb, 0644)
+
+		return nil 
+	}
+
+	if cmd.DB != "" {
+		os.MkdirAll(filepath.Dir(cmd.DB), 0755)
+		bb, err := json.Marshal(news)
+		if err != nil {
+			return err
+		}
+		ioutil.WriteFile(cmd.DB, bb, 0644)
+		return nil
+	}
+		
+
+	if cmd.JSON {
+		return json.NewEncoder(cmd.Stdout()).Encode(news)
+	}
+
 	cmd.print(news)
 	//clearing the service
 	cmd.Service.Clear()
@@ -95,7 +140,6 @@ func(cmd *ReadCmd)init(pwd string, args []string) error {
 }
 
 func (cmd *ReadCmd) print(news []week11.News){
-	fmt.Println(cmd.Output)
 
 	for _, n := range news {
 		fmt.Fprintf(cmd.Stdout(), "%v %v %v \n", n.Id, n.Body, n.Catagory )

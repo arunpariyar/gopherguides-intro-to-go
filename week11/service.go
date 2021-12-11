@@ -213,6 +213,20 @@ func (ns *Service) Backup() error {
 	return nil
 }
 
+func (ns *Service) BackupTo(s string) error {
+	ns.Lock()
+	bb, err := json.Marshal(ns.history)
+	ns.Unlock()
+
+	if err != nil {
+		return err
+	}
+	ns.Lock()
+	ioutil.WriteFile(s, bb, 0644)
+	ns.Unlock()
+	return nil
+}
+
 func (ns *Service) Archive() error {
 	for {
 		time.Sleep(4 * time.Millisecond)

@@ -28,6 +28,7 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 			},
 		}
 	}
+	
 
 	cmd, ok := app.Commands[args[0]]
 	if !ok {
@@ -37,7 +38,7 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 	if ioc, ok := cmd.(IOCommander); ok {
 		ioc.SetIO(app.IO)
 	}
-
+	
 	return cmd.Main(ctx, pwd, args[1:])
 }
 
