@@ -26,6 +26,9 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 			"read":&ReadCmd{
 				Name: "read",
 			},
+			"clear":&ClearCmd{
+				Name: "clear",
+			},
 		}
 	}
 	
@@ -46,6 +49,6 @@ func (app *App) Usage(w io.Writer) error {
 	fmt.Fprintln(w, "Usage: ugotnews <command> [options][<args>...]")
 	fmt.Fprintln(w, "---------------")
 
-	//TODO: pring sub-commandsß
+	//TODO: pring sub-commands
 	return nil
 }

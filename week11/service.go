@@ -208,7 +208,7 @@ func (ns *Service) Backup() error {
 		return err
 	}
 	ns.Lock()
-	ioutil.WriteFile("./serviceBackup.json", bb, 0644)
+	ioutil.WriteFile("./tmp/news_service.json", bb, 0644)
 	ns.Unlock()
 	return nil
 }
@@ -235,7 +235,7 @@ func (ns *Service) Archive() error {
 }
 
 func (ns *Service) LoadArchive() error {
-	bb, err := ioutil.ReadFile("./serviceBackup.json")
+	bb, err := ioutil.ReadFile("./tmp/news_service.json")
 	if err != nil {
 		return err
 	}

@@ -57,8 +57,7 @@ func(cmd *ReadCmd)init(pwd string, args []string) error {
 		ss := strings.Split(args[i], ",")
 		cleanArgs = append(cleanArgs, ss...)
 	}
-		
-
+	
 	if err := cmd.Flags().Parse(cleanArgs); err != nil {
 		return err
 	}
