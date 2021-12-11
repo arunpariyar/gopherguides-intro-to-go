@@ -9,11 +9,12 @@ import (
 	"time"
 )
 
+//Service is the core of the news application
 type Service struct {
-	subs    map[string]Catagories
+	subs    map[string]Categories
 	srcs    []string
 	sub_chl map[string]chan News
-	src_chl map[string]chan story
+	src_chl map[string]chan Article
 	History map[int]News
 	Once    sync.Once
 	stopped bool
@@ -21,51 +22,49 @@ type Service struct {
 	sync.RWMutex
 }
 
+//NewService is a constructor function that allows creation of a service
 func NewService() *Service {
 	s := &Service{
-		subs:    make(map[string]Catagories), //subscriber name and news catagories
-		srcs:    make([]string, 0),           //source name and catagories
-		sub_chl: make(map[string]chan News),  // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
-		src_chl: make(map[string]chan story), //a channels to listen from every source for stories
+		subs:    make(map[string]Categories),   //subscriber name and news catagories
+		srcs:    make([]string, 0),             //source name and catagories
+		sub_chl: make(map[string]chan News),    // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
+		src_chl: make(map[string]chan Article), //a channels to listen from every source for stories
 		History: make(map[int]News),
 	}
 	return s
 }
 
+//Start Methods allows a service to be started
+//A Background context must be provides as an argument
 func (ns *Service) Start(ctx context.Context) {
 	ctx, ns.cancel = context.WithCancel(ctx)
 	ns.LoadArchive()
 
 	for _, ch := range ns.src_chl {
-		go ns.listen(ctx, ch)
+		go ns.SrcListener(ctx, ch)
 	}
-	// this will archive the history every 2 seconds
+
 	go ns.Archive()
 
 }
 
-//trying to remove subscriber all together
-func (ns *Service) Subscribe(n string, cs ...Catagory) {
-	cats := make([]Catagory, 0)
+//Subscribe allows creation of a new subscriber for the news service
+func (ns *Service) Subscribe(n string, cs ...Category) {
+	cats := make([]Category, 0)
 	cats = append(cats, cs...)
 	//error checks must be added later
 	ns.Lock()
 	ns.subs[n] = cats
 	ns.sub_chl[n] = make(chan News)
 	ns.Unlock()
-	//as soon as the subsriber subscribe start publishing news as well // no need to return a channel start displaying news
 
-	// This must be lauched as a goroutine or it will block
-	go Listen(ns.sub_chl[n])
+	go SubListener(ns.sub_chl[n])
 }
 
-//To unsubscribe from the Service
-func (ns *Service) UnSubscribe(s string) error {
-
-	//return not found if not found
+//Unsubscribe allows an existing subscriber to opt out from the service
+func (ns *Service) Unsubscribe(s string) error {
 	for name, _ := range ns.subs {
 		if s == name {
-
 			ns.Lock()
 			delete(ns.subs, s)
 			delete(ns.sub_chl, s)
@@ -74,30 +73,32 @@ func (ns *Service) UnSubscribe(s string) error {
 			return nil
 		}
 	}
-	return fmt.Errorf("%#v subscriber not found in subscription", s)
+	return fmt.Errorf("%v has not subscribed", s)
 }
 
-// This function will automaticaly start listening to the channel once subscribed.
-func Listen(ch chan News) {
+//SubListener keeps watch on subscriber channel
+//SubListener is to be used as go routine
+func SubListener(ch chan News) {
 	for news := range ch {
 		fmt.Println(news)
 	}
 }
 
+//Add allows new sources to be added to the service
 func (ns *Service) Add(ctx context.Context, s Source) {
 	//error checks must be added later
 	ns.Lock()
 	ns.srcs = append(ns.srcs, s.Name())
 	ns.src_chl[s.Name()] = s.News()
 	ns.Unlock()
-	go ns.listen(ctx, s.News())
+	go ns.SrcListener(ctx, s.News())
 }
 
-//remove a source
+//Remove allows existing sources to be removed from the service
 func (ns *Service) Remove(ctx context.Context, s Source) error {
 	ok, index := Contains(ns.srcs, s.Name())
 	if !ok {
-		return fmt.Errorf("%v is not a Source", s.Name())
+		return fmt.Errorf("%v not found", s.Name())
 	}
 	_, cancel := context.WithCancel(ctx)
 	cancel()
@@ -110,15 +111,16 @@ func (ns *Service) Remove(ctx context.Context, s Source) error {
 	return nil
 }
 
-func (ns *Service) listen(ctx context.Context, ch chan story) {
+//SrcListener listens for articles coming from sources
+func (ns *Service) SrcListener(ctx context.Context, ch chan Article) {
 	// convert story to news
 	for st := range ch {
-		func(st story) { //not running this as a go routine otherwise it won't get the ids right
+		func(st Article) { //not running this as a go routine otherwise it won't get the ids right
 			ns.Lock()
 			news := News{}
-			news.Id = len(ns.History) + 1
+			news.ID = len(ns.History) + 1
 			news.Body = st.Body
-			news.Catagory = st.Catagory
+			news.Category = st.Category
 			ns.Unlock()
 
 			ns.Publish(news)
@@ -126,13 +128,14 @@ func (ns *Service) listen(ctx context.Context, ch chan story) {
 	}
 
 	<-ctx.Done()
-	fmt.Println("Source Closing Down")
+	// fmt.Println("Source Closing Down")
 }
 
+//Publish distributes news to the relevent subscribers
 func (ns *Service) Publish(n News) {
 	//save to history
 	ns.Lock()
-	ns.History[n.Id] = n
+	ns.History[n.ID] = n
 	ns.Unlock()
 
 	ns.RLock()
@@ -140,7 +143,7 @@ func (ns *Service) Publish(n News) {
 	//send to the subscrber
 	for sub, cs := range ns.subs {
 		for _, c := range cs {
-			if string(n.Catagory) == string(c) {
+			if string(n.Category) == string(c) {
 				ch := ns.sub_chl[sub]
 				ch <- n
 			}
@@ -149,6 +152,7 @@ func (ns *Service) Publish(n News) {
 
 }
 
+//Stop closes the operation of a Service
 func (ns *Service) Stop() {
 	ns.RLock()
 	if ns.stopped {
@@ -175,7 +179,8 @@ func (ns *Service) Stop() {
 
 }
 
-//there must be an error case as well.
+//Search allows to read from the services' history
+//Search takes in ids of int as parameters
 func (ns *Service) Search(ids ...int) ([]News, error) {
 	if len(ids) == 0 {
 		return nil, fmt.Errorf("no ID's entered")
@@ -212,6 +217,7 @@ func (ns *Service) Backup() error {
 	return nil
 }
 
+//BackupTo allows the user to provide a desired name for creating a backup
 func (ns *Service) BackupTo(s string) error {
 	ns.Lock()
 	bb, err := json.Marshal(ns.History)
@@ -226,6 +232,7 @@ func (ns *Service) BackupTo(s string) error {
 	return nil
 }
 
+//Archive performs a reoccuring backup of the services' history
 func (ns *Service) Archive() error {
 	for {
 		time.Sleep(4 * time.Millisecond)
@@ -233,6 +240,7 @@ func (ns *Service) Archive() error {
 	}
 }
 
+//LoadArchive allows past backup to be loaded to the services' history
 func (ns *Service) LoadArchive() error {
 	bb, err := ioutil.ReadFile("./tmp/news_service.json")
 	if err != nil {
@@ -262,6 +270,7 @@ func (ns *Service) Clear() {
 	ns.Backup()
 }
 
+//Contains is a helper function that allows identifying if a element exists in a Slice
 func Contains(srcs []string, src string) (bool, int) {
 	for i, v := range srcs {
 		if v == src {
@@ -271,6 +280,7 @@ func Contains(srcs []string, src string) (bool, int) {
 	return false, 0
 }
 
+//Remove Index is a helper function that allows removal of an element from a slice
 func RemoveIndex(s []string, index int) []string {
 	return append(s[:index], s[index+1:]...)
 }

@@ -2,13 +2,12 @@ package week11
 
 import (
 	"context"
-	"fmt"
 	"sync"
 )
 
 type MockSource struct {
 	name    string
-	news    chan story
+	news    chan Article
 	cancel  context.CancelFunc
 	stopped bool
 	Once    sync.Once
@@ -18,7 +17,7 @@ type MockSource struct {
 func NewMockSource(s string) *MockSource {
 	ms := &MockSource{
 		name: s,
-		news: make(chan story),
+		news: make(chan Article),
 	}
 	return ms
 }
@@ -34,7 +33,7 @@ func (ms *MockSource) Name() string {
 	return ms.name
 }
 
-func (ms *MockSource) Publish(ctx context.Context, s story) {
+func (ms *MockSource) Publish(ctx context.Context, s Article) {
 	ms.RLock()
 	if !ms.stopped {
 		ms.news <- s
@@ -42,11 +41,10 @@ func (ms *MockSource) Publish(ctx context.Context, s story) {
 	ms.RUnlock()
 
 	<-ctx.Done()
-
-	fmt.Println("Closing mock service channel")
+	// fmt.Println("Closing mock service channel")
 }
 
-func (ms *MockSource) News() chan story {
+func (ms *MockSource) News() chan Article {
 	return ms.news
 }
 

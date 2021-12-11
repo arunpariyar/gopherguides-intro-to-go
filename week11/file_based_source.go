@@ -10,7 +10,7 @@ import (
 
 type FileSource struct {
 	name    string
-	news    chan story
+	news    chan Article
 	cancel  context.CancelFunc
 	stopped bool
 	Once    sync.Once
@@ -20,7 +20,7 @@ type FileSource struct {
 func NewFileSource(s string) *FileSource {
 	nfs := &FileSource{
 		name: s,
-		news: make(chan story),
+		news: make(chan Article),
 	}
 	return nfs
 }
@@ -36,7 +36,7 @@ func (nfs *FileSource) Start(ctx context.Context) context.Context {
 	return ctx
 }
 
-func (nfs *FileSource) Publish(ctx context.Context, s story) {
+func (nfs *FileSource) Publish(ctx context.Context, s Article) {
 	nfs.RLock()
 	if !nfs.stopped {
 		nfs.news <- s
@@ -62,7 +62,7 @@ func (nfs *FileSource) PublishStories() error {
 
 }
 
-func (nfs *FileSource) News() chan story {
+func (nfs *FileSource) News() chan Article {
 	return nfs.news
 }
 
@@ -85,18 +85,18 @@ func (nfs *FileSource) Stop() {
 	})
 }
 
-func (ns *FileSource) LoadFile() (stories, error) {
+func (ns *FileSource) LoadFile() (Articles, error) {
 	bb, err := ioutil.ReadFile("./stories/stories.json")
 	if err != nil {
 		return nil, err
 	}
 
-	stories := make([]story, 0)
+	articles := make([]Article, 0)
 
-	err = json.Unmarshal(bb, &stories)
+	err = json.Unmarshal(bb, &articles)
 
 	if err != nil {
 		return nil, err
 	}
-	return stories, nil
+	return articles, nil
 }

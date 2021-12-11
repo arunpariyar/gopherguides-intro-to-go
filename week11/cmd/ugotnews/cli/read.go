@@ -46,16 +46,14 @@ func (cmd *ReadCmd)Main(ctx context.Context, pwd string, args []string)error{
 	return nil
 }
 
-func (cmd *ReadCmd) SetIO(oi IO){
-	cmd.IO = oi
-}
 
 func(cmd *ReadCmd)init(pwd string, args []string) error {
-	//seperates arguments by commas
+	index := len(args)
 	cleanArgs := make([]string,0)
-	ss := strings.Split(args[0], ", ")
-	cleanArgs = append(cleanArgs, ss...)
-	fmt.Println(cleanArgs)
+	for i:=0; i<index; i++{
+		ss := strings.Split(args[i], ",")
+		cleanArgs = append(cleanArgs, ss...)
+	}
 	
 	if err := cmd.Flags().Parse(cleanArgs); err != nil {
 		return err
@@ -139,7 +137,11 @@ func(cmd *ReadCmd)init(pwd string, args []string) error {
 func (cmd *ReadCmd) print(news []week11.News){
 
 	for _, n := range news {
-		fmt.Fprintf(cmd.Stdout(), "%v %v %v \n", n.Id, n.Body, n.Catagory )
+		fmt.Fprintf(cmd.Stdout(), "%v %v %v \n", n.ID, n.Body, n.Category )
 	}
+}
+
+func (cmd *ReadCmd) SetIO(oi IO){
+	cmd.IO = oi
 }
 

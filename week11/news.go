@@ -1,7 +1,11 @@
 package week11
 
+//News is produced by the service by adding an ID to the article
 type News struct {
-	Id       int    `json:"id"`
-	Body     string `json:"body"`
-	Catagory string `json:"catagory"`
+	// News identification Number
+	ID int `json:"id"`
+	//Main text of the news
+	Body string `json:"body"`
+	//Category of the news
+	Category string `json:"catagory"`
 }

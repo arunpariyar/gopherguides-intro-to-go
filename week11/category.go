@@ -1,4 +1,7 @@
 package week11
 
-type Catagory string
-type Catagories []Catagory
+//Category define theme of a news
+type Category string
+
+//Collection type for category
+type Categories []Category
