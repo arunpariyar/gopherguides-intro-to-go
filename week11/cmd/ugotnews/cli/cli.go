@@ -29,8 +29,8 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 			"clear":&ClearCmd{
 				Name: "clear",
 			},
-			"stream":&StreamCmd{
-				Name: "stream",
+			"ugotnews":&UgotnewsCmd{
+				Name: "ugotnews",
 			},
 		}
 	}
@@ -43,10 +43,10 @@ func (app *App) Main(ctx context.Context, pwd string, args []string) error {
 
 	if ioc, ok := cmd.(IOCommander); ok {
 		ioc.SetIO(app.IO)
-	}
-	
+	}	
 	return cmd.Main(ctx, pwd, args[1:])
 }
+
 
 func (app *App) Usage(w io.Writer) error {
 	fmt.Fprintln(w, "Usage: ugotnews <command> [options][<args>...]")

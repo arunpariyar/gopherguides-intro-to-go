@@ -14,7 +14,7 @@ type Service struct {
 	srcs    []string
 	sub_chl map[string]chan News
 	src_chl map[string]chan story
-	history map[int]News
+	History map[int]News
 	Once    sync.Once
 	stopped bool
 	cancel  context.CancelFunc
@@ -27,7 +27,7 @@ func NewService() *Service {
 		srcs:    make([]string, 0),           //source name and catagories
 		sub_chl: make(map[string]chan News),  // a channel to give to every subscriber THE WILL NOT BE REQUIRED AT ALL
 		src_chl: make(map[string]chan story), //a channels to listen from every source for stories
-		history: make(map[int]News),
+		History: make(map[int]News),
 	}
 	return s
 }
@@ -116,7 +116,7 @@ func (ns *Service) listen(ctx context.Context, ch chan story) {
 		func(st story) { //not running this as a go routine otherwise it won't get the ids right
 			ns.Lock()
 			news := News{}
-			news.Id = len(ns.history) + 1
+			news.Id = len(ns.History) + 1
 			news.Body = st.Body
 			news.Catagory = st.Catagory
 			ns.Unlock()
@@ -132,7 +132,7 @@ func (ns *Service) listen(ctx context.Context, ch chan story) {
 func (ns *Service) Publish(n News) {
 	//save to history
 	ns.Lock()
-	ns.history[n.Id] = n
+	ns.History[n.Id] = n
 	ns.Unlock()
 
 	ns.RLock()
@@ -184,7 +184,7 @@ func (ns *Service) Search(ids ...int) ([]News, error) {
 
 	for _, id := range ids {
 		ns.Lock()
-		news, ok := ns.history[id]
+		news, ok := ns.History[id]
 		ns.Unlock()
 
 		if !ok {
@@ -200,7 +200,7 @@ func (ns *Service) Search(ids ...int) ([]News, error) {
 
 func (ns *Service) Backup() error {
 	ns.Lock()
-	bb, err := json.Marshal(ns.history)
+	bb, err := json.Marshal(ns.History)
 	ns.Unlock()
 
 	if err != nil {
@@ -214,7 +214,7 @@ func (ns *Service) Backup() error {
 
 func (ns *Service) BackupTo(s string) error {
 	ns.Lock()
-	bb, err := json.Marshal(ns.history)
+	bb, err := json.Marshal(ns.History)
 	ns.Unlock()
 
 	if err != nil {
@@ -248,7 +248,7 @@ func (ns *Service) LoadArchive() error {
 	}
 
 	for key, news := range backup {
-		ns.history[key] = news
+		ns.History[key] = news
 	}
 	return nil
 }
@@ -256,7 +256,7 @@ func (ns *Service) LoadArchive() error {
 func (ns *Service) Clear() {
 	clear := make(map[int]News)
 	ns.Lock()
-	ns.history = clear
+	ns.History = clear
 	ns.Unlock()
 
 	ns.Backup()
