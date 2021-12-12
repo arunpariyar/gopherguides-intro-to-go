@@ -4,9 +4,9 @@
 
 ## UGotNews
 
-**Streamline your news with simple catagories and keep them news coming :)**
+**Streamline your news with simple categories and keep them news coming :)**
 
-UGotNews is a simple news service designed to deliver your news based on simple catagories.
+UGotNews is a simple news service designed to deliver your news based on simple categories.
 
 #### Introduction And Overview
 
@@ -20,11 +20,11 @@ This project is built with Go by a beginner Gopher
 
 ## Under The Hood
 
-UGotNews works atop service that is the heart of the application. All the building blocks that make the serice are introduced below.
+UGotNews works atop service that is the heart of the application. All the building blocks that make the service are introduced below.
 
 ##### Article
 
-`Article` is the smallest working unit of the application that represents a news in its raw form. A collection type `Articles` is also defined for ease of use. _(Definition & Usage)_
+`Article` is the smallest working unit of the application that represents a News in its raw form. A collection type `Articles` is also defined for ease of use. _(Definition & Usage)_
 
 ##### Category
 
@@ -40,7 +40,7 @@ UGotNews works atop service that is the heart of the application. All the buildi
 
 ##### Service
 
-`Service` is the core that makes this application work. A publish/subsribe implementation it is capable of concurrently handling many sources and subscribers at a time. _(Definition & Usage)_
+`Service` is the core that makes this application work. A publish/subscribe implementation it is capable of concurrently handling many sources and subscribers at a time. _(Definition & Usage)_
 
 ## Getting Started
 
@@ -52,7 +52,7 @@ Please make sure to install Go 1.17 before you start, you can download Go from [
 
 go get github.com/arunpariyar/gopherguides-intro-to-go/tree/week11
 
-## Definition and Usuage
+## Definition and Usage
 
 ##### Service API
 
@@ -108,7 +108,7 @@ Service is solely responsible for managing the tasks below
   func (ns *Service) SrcListener(ctx context.Context, ch chan Article) {...}
   ```
 
-- Publish news and distribute to relevent subscribers
+- Publish news and distribute to relevant subscribers
   ```
   func (ns *Service) Publish(n News) {..}
   ```
@@ -130,7 +130,7 @@ type Source interface {
 
 #### Predefined Source API (! Only for testing)
 
-It is possible to create new sources based on the intefaces. However for ease two sources Mock News Source and File Based Sources is creating for test purposes.
+It is possible to create new sources based on the interfaces. However, for ease two sources Mock News Source and File Based Sources is creating for test purposes.
 
 ##### Mock news source
 
@@ -147,7 +147,7 @@ type MockSource struct {
 
 A user controlled news source that allows the task below
 
-- Create a new mock news service
+- Creating a new mock news service
   ```
   func NewMockSource(s string) *MockSource {...}
   ```
@@ -209,7 +209,7 @@ The application provides a CLI integration to run the application the following 
 
 - **Read Command**
 
-  The `Read` command allows to read from the history of the service and print them as desired
+  The `Read` command allows reading from the history of the service and print them as desired
 
   The available flags are:
 
@@ -235,11 +235,11 @@ The application provides a CLI integration to run the application the following 
   - `go run cmd/ugotnews/main.go clear`
   - `go run cmd/ugotnews/main.go clear news_service.json`
 
-**_Unfortunatley as of yet only the clear and read command has been integreted to the application_**
+**_Unfortunately as yet only the clear and read command has been integrated to the application_**
 
 ## Examples
 
-Here is an implementaion for using the mock based service.
+Here is an implementation for using the mock based service.
 
 ```
 //create a new news serive
@@ -281,7 +281,7 @@ time.Sleep(5 * time.Millisecond)
 ns.Stop()
 ```
 
-Here is an Implemention of the file based service
+Here is an Implementation of the file based service
 
 ```
 //create a new news serive
@@ -313,7 +313,7 @@ nfs.PublishStories()
 
 err = ns.Remove(nCtx, nfs)
 if err != nil {
-	t.Error(err)
+	t.Error(err)****
 }
 
 //allowing some sleeping time to ensure all go routines get time to complete
@@ -328,7 +328,7 @@ ns.Stop()
 - [ ] Integration of root command and stream command
 - [ ] The App does not wait for new messages to come but exits once the initial articles are distributed to the subscribers
 - [ ] Integration of defined Errors
-- [ ] I believe that the packages could be better organised
+- [ ] I believe that the packages could be better organized
 
 ## Testing
 
@@ -338,12 +338,12 @@ Once you have a local copy of the project you can run the testings using the com
 
 While this project is still at its early stage. If you wish to make any contributions you are most welcome and **greatly appreciated.**
 
-if you have any suggestion, please for the repo and create a pull request. You can also simply open an issue with the tag "suggestion". Don't forget to give the UGotNews a star! Thanks Again!
+If you have any suggestion, please for the repo and create a pull request. You can also simply open an issue with the tag "suggestion". Don't forget to give the UGotNews a star! Thanks Again!
 
 1. Fork the Project
-2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
-3. Commit your Changes (git commit -m 'Add some AmazingFeature')
-4. Push to the Branch (git push origin feature/AmazingFeature)
+2. Create your Feature Branch (git checkout -b feature/NewFeature)
+3. Commit your Changes (git commit -m 'Add some NewFeature')
+4. Push to the Branch (git push origin feature/NewFeature)
 5. Open a Pull Request
 
 ## License
@@ -352,15 +352,13 @@ Distributed under the MIT License. See LICENSE.txt for more information.
 
 ## About the author
 
-I aspire to be developer but the developement world is huge and its important to find what works, what doesn't, if it clicks or its doesn't, love it or hate it.
-
-I am currently in this process and heavily suffering from imposter syndrome, some days more that others but I believe in the light at the end of the tunnel.
+I aspire to be developer. However, The development world is huge and it is important to find what works, what doesn't, if it clicks or its doesn't, love it or hate it. I am currently in this process and heavily suffering from imposter syndrome, some days more that others but I believe in the light at the end of the tunnel.
 
 This project is a journey child of exploring the Go Programming Language under the guidance of Gopher Guides Instructor Mark Bates.
 
-## Acknowlegments
+## Acknowledgments
 
-A journey is owed to those that point the way to the true north,its so easy to feel lost. I owe it to the Gopher Guides team Mark Bates and Corey Lou. I wouldnt have made it to the finish line otherwise.
+A journey is owed to those that point the way to the true north, it is so easy to feel lost. I owe it to the Gopher Guides team Mark Bates and Corey Lou. I would not have made it to the finish line otherwise.
 
 A journey also means meeting in the journey as we who become companions.
-My sincerest thanks to Naveen and Christopher for being the most resourceful companions to sit beside the fire in cold night and their help in making this project an achievable endeavour.
+My sincerest thanks to Naveen and Christopher for being the most resourceful companions to sit beside the fire in cold night and their help in making this project achievable.
