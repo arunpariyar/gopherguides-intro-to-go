@@ -118,27 +118,90 @@ Service is solely responsible for managing the tasks below
   func (ns *Service) Stop() {...}
   ```
 
-#### Predefined Sources (! Only for testing)
+#### Source Interface
+
+```
+type Source interface {
+	Name() string
+	Publish(context.Context, Article)
+	News() chan Article
+}
+```
+
+#### Predefined Source API (! Only for testing)
 
 It is possible to create new sources based on the intefaces. However for ease two sources Mock News Source and File Based Sources is creating for test purposes.
 
 ##### Mock news source
 
+```
+type MockSource struct {
+	name    string
+	news    chan Article
+	cancel  context.CancelFunc
+	stopped bool
+	Once    sync.Once
+	sync.RWMutex
+}
+```
+
 A user controlled news source that allows the task below
 
 - Create a new mock news service
+  ```
+  func NewMockSource(s string) *MockSource {...}
+  ```
 - Start the new mock new
+
+  ```
+  func (ms *MockSource) Start(ctx context.Context) context.Context {..}
+  ```
+
 - Feeding stories on by one
+  ```
+  func (ms *MockSource) Publish(ctx context.Context, s Article) {...}
+  ```
 - Closing the mock source
+  ```
+  func (ms *MockSource) Stop() {...}
+  ```
 
 ##### File based source
+
+```
+type FileSource struct {
+	name    string
+	news    chan Article
+	cancel  context.CancelFunc
+	stopped bool
+	Once    sync.Once
+	sync.RWMutex
+}
+```
 
 A file based news source that reads a JSON files and feeds it to the news service. It allows the task below.
 
 - Create a new file based source
+  ```
+  func NewFileSource(s string) *FileSource {...}
+  ```
 - Start a file based source
+
+  ```
+  func (nfs *FileSource) Start(ctx context.Context) context.Context {...}
+
+  ```
+
 - Feed articles
+
+  ```
+  func (nfs *FileSource) PublishStories() error {...}
+  ```
+
 - Close file base source
+  ```
+  func (nfs *FileSource) Stop() {...}
+  ```
 
 ## Examples
 

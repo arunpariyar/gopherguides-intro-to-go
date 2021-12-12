@@ -6,7 +6,7 @@ import "context"
 type Source interface {
 	//Returns name of the source
 	Name() string
-	//Publish method requires the sources context an articel
+	//Publish method requires the sources context an article
 	Publish(context.Context, Article)
 	//Returns channel that news service can store and listen to
 	News() chan Article
