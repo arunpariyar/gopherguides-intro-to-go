@@ -235,11 +235,16 @@ The application provides a CLI integration to run the application the following 
   - `go run cmd/ugotnews/main.go clear`
   - `go run cmd/ugotnews/main.go clear news_service.json`
 
+**_Unfortunatley as of yet only the clear and read command has been integreted to the application_**
+
 ## Examples
 
 ## Existing Issues
 
-- [x] Design
+- [ ] Integration of root command and stream command
+- [ ] The App doesnot wait for message to come but exits once the initial articles are send down from subscribers
+- [ ] Integration of defined Errors
+- [ ] I believe that the packages could be better organised
 
 ## Testing
 
