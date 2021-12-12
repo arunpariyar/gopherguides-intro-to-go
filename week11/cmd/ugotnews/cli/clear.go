@@ -53,9 +53,9 @@ func (cmd *ClearCmd) init(pwd string, args []string) error {
 	cmd.Service.Start(context.Background())
 	//creating a new file source to publish news
 	nfs := week11.NewFileSource("auto")
-	//adding it to the news service
+	// //adding it to the news service
 	cmd.Service.Add(context.Background(),nfs)
-	//publishing stories in a go routine
+	// //publishing stories in a go routine
 	nfs.PublishStories()
 	cmd.Service.Clear()
 	// fmt.Println(pwd, args, cmd.DB)

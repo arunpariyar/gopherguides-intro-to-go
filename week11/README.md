@@ -208,18 +208,32 @@ A file based news source that reads a JSON files and feeds it to the news servic
 The application provides a CLI integration to run the application the following commands are currently integrated the application.
 
 - **Read Command**
-  The `Read` command allows to read from the history of the service and print them as desired the available flags are:
 
-  - j : for output in JSON format
-  - f : location for the backup file
-  - o : output result to a file
+  The `Read` command allows to read from the history of the service and print them as desired
+
+  The available flags are:
+
+  - `-j` : for output in JSON format
+  - `-f` : location for the backup file
+  - `-o` : output result to a file
 
   Some Example commands you can use are:
 
-  - go run cmd/ugotnews/main.go read 1,2,3,4,5
-  - go run cmd/ugotnews/main.go read -j 1,2,3,4,5
-  - go run cmd/ugotnews/main.go read -o ./articles.json 1,2,3,4,5
-  - go run cmd/ugotnews/main.go read -o ./articles.json -j -f ./tmp/news.json 1, 2, 3, 4, 5
+  - `go run cmd/ugotnews/main.go read 1,2,3,4,5`
+  - `go run cmd/ugotnews/main.go read -j 1,2,3,4,5`
+  - `go run cmd/ugotnews/main.go read -o ./articles.json 1,2,3,4,5`
+  - `go run cmd/ugotnews/main.go read -o ./articles.json -j -f ./tmp/news.json 1, 2, 3, 4, 5`
+
+- **Clear Command**
+  The `clear` command clears the news service of all news stories
+  The available flags are:
+
+  - `-f` : file location of the backup file
+
+  Some Example commands you can use are:
+
+  - `go run cmd/ugotnews/main.go clear`
+  - `go run cmd/ugotnews/main.go clear news_service.json`
 
 ## Examples
 
