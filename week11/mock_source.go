@@ -49,20 +49,16 @@ func (ms *MockSource) News() chan Article {
 }
 
 func (ms *MockSource) Stop() {
-
 	if ms.stopped {
 		return
 	}
-
 	ms.Once.Do(func() {
 		ms.Lock()
 		defer ms.Unlock()
 		ms.cancel()
 		ms.stopped = true
 		if ms.news != nil {
-
 			close(ms.news)
-
 		}
 	})
 }
