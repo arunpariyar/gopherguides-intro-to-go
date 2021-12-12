@@ -40,16 +40,20 @@ UGotNews works atop service that is the heart of the application. All the buildi
 
 `Service` is the core that makes this application work. A publish/subsribe implementation it is capable of concurrently handling many sources and subscribers at a time. _(Definition & Usage)_
 
-Getting Started
+#### Getting Started
+
 Follow the simple steps below to get started.
 Prerequisites
 Please make sure to install Go 1.17 before you start, you can download Go from [here](https://go.dev/).
 
-Installation:
+#### Installation:
 
 go get github.com/arunpariyar/gopherguides-intro-to-go/tree/week11
 
-Service API
+#### Definition and Usuage
+
+##### Service API
+
 Service is solely responsible for managing the tasks below
 
 - Generating a news instance of service
@@ -60,11 +64,12 @@ Service is solely responsible for managing the tasks below
 - Removing an existing news source
 - Stopping its service
 
-! Only for testing
-Predefined Sources
+#### Predefined Sources (! Only for testing)
+
 It is possible to create new sources based on the intefaces. However for ease two sources Mock News Source and File Based Sources is creating for test purposes.
 
-**Mock news source**
+##### Mock news source
+
 A user controlled news source that allows the task below
 
 - Create a new mock news service
@@ -72,7 +77,8 @@ A user controlled news source that allows the task below
 - Feeding stories on by one
 - Closing the mock source
 
-**File based source**
+##### File based source
+
 A file based news source that reads a JSON files and feeds it to the news service. It allows the task below.
 
 - Create a new file based source
