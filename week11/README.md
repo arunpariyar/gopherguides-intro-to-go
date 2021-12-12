@@ -8,7 +8,9 @@
 
 UGotNews is a simple news service designed to deliver your news based on simple catagories.
 
-#### Overview
+#### Introduction And Overview
+
+//write here about why this project was written
 
 UGotNews API can be imported and used in your projects, it also incorporates a command line to interface with UGotNews.
 
@@ -16,17 +18,17 @@ UGotNews API can be imported and used in your projects, it also incorporates a c
 
 This project is built with Go by a beginner Gopher
 
-#### Under The Hood
+## Under The Hood
 
 UGotNews works atop service that is the heart of the application. All the building blocks that make the serice are introduced below.
 
 ##### Article
 
-`Article` is the smallest working unit of the application that represents a news in its raw form. A collection type `Articles` is also defined. _(Definition & Usage)_
+`Article` is the smallest working unit of the application that represents a news in its raw form. A collection type `Articles` is also defined for ease of use. _(Definition & Usage)_
 
 ##### Category
 
-`Category` is provides the area of news an article provides such as politics, arts e.t.c. A collection type `Categories` is also defined.
+`Category` is provides the area of news an article provides such as politics, arts e.t.c. A collection type `Categories` is also defined for ease of use.
 
 ##### News
 
@@ -40,7 +42,7 @@ UGotNews works atop service that is the heart of the application. All the buildi
 
 `Service` is the core that makes this application work. A publish/subsribe implementation it is capable of concurrently handling many sources and subscribers at a time. _(Definition & Usage)_
 
-#### Getting Started
+## Getting Started
 
 Follow the simple steps below to get started.
 Prerequisites
@@ -50,7 +52,7 @@ Please make sure to install Go 1.17 before you start, you can download Go from [
 
 go get github.com/arunpariyar/gopherguides-intro-to-go/tree/week11
 
-#### Definition and Usuage
+## Definition and Usuage
 
 ##### Service API
 
@@ -86,4 +88,33 @@ A file based news source that reads a JSON files and feeds it to the news servic
 - Feed articles
 - Close file base source
 
-Definitions
+## Examples
+
+## Existing Issues
+- [x] Design
+
+## Testing
+
+## Contributing
+
+While this project is still at its early stage. If you wish to make any contributions you are most welcome and **greatly appreciated.**
+
+if you have any suggestion, please for the repo and create a pull request. You can also simply open an issue with the tag "suggestion". Don't forget to give the UGotNews a star! Thanks Again!
+
+1. Fork the Project
+2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
+3. Commit your Changes (git commit -m 'Add some AmazingFeature')
+4. Push to the Branch (git push origin feature/AmazingFeature)
+5. Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See LICENSE.txt for more information.
+
+## About the author
+Arun Pariyar aspires to be developer but the developement world is huge and its important to find what works, what doesn't, if it clicks or its doesn't, love it or hate it. Author is in currently in this process and heavily suffering from imposter syndrome, some days more that others but he believes in the light at the end of the tunnel. This project is a journey child of exploring the Go Programming Language under the guidance of Gopher Guides Instructor Mark Bates. 
+
+## Acknowlegments
+A journey is owed to those that point the way to the true north,its so easy to feel lost. The Author owes it to the Gopher Guides team Mark Bates and Corey Lou. The Author wouldnt have made it to the finish line otherwise. 
+
+A journey also means meeting others travelling the same route a big thanks to Naveen and Christopher for being the coolest companions to sit beside the fire in cold night and their help in making this project an achievable endeavour.
