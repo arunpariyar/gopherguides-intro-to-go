@@ -10,7 +10,7 @@ UGotNews is a simple news service designed to deliver your news based on simple 
 
 #### Introduction And Overview
 
-//write here about why this project was written
+This project is part of the assignment under the curriculum of Intro to Go course provided by Gopher Guides.
 
 UGotNews API can be imported and used in your projects, it also incorporates a command line to interface with UGotNews.
 
@@ -203,6 +203,24 @@ A file based news source that reads a JSON files and feeds it to the news servic
   func (nfs *FileSource) Stop() {...}
   ```
 
+## Command Line
+
+The application provides a CLI integration to run the application the following commands are currently integrated the application.
+
+- **Read Command**
+  The `Read` command allows to read from the history of the service and print them as desired the available flags are:
+
+  - j : for output in JSON format
+  - f : location for the backup file
+  - o : output result to a file
+
+  Some Example commands you can use are:
+
+  - go run cmd/ugotnews/main.go read 1,2,3,4,5
+  - go run cmd/ugotnews/main.go read -j 1,2,3,4,5
+  - go run cmd/ugotnews/main.go read -o ./articles.json 1,2,3,4,5
+  - go run cmd/ugotnews/main.go read -o ./articles.json -j -f ./tmp/news.json 1, 2, 3, 4, 5
+
 ## Examples
 
 ## Existing Issues
@@ -210,6 +228,8 @@ A file based news source that reads a JSON files and feeds it to the news servic
 - [x] Design
 
 ## Testing
+
+Once you have a local copy of the project you can run the testings using the command `go test -v`.
 
 ## Contributing
 

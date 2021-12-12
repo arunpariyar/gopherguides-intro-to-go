@@ -34,8 +34,9 @@ func (cmd *ReadCmd) Flags() *flag.FlagSet {
 	cmd.flags = flag.NewFlagSet(cmd.Name, flag.ContinueOnError)
 	//adding the flags to the flagset
 	cmd.flags.BoolVar(&cmd.JSON, "j", cmd.JSON, "output in json format")
-	cmd.flags.StringVar(&cmd.DB, "f", cmd.DB, "location of news DB file")
+	cmd.flags.StringVar(&cmd.DB, "f", cmd.DB, "location for the backup file")
 	cmd.flags.StringVar(&cmd.Output,"o", cmd.Output, "output result to a file")
+	
 	return cmd.flags
 }
 
