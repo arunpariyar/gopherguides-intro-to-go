@@ -239,10 +239,52 @@ The application provides a CLI integration to run the application the following 
 
 ## Examples
 
+Here is an implementaion for using the mock based service.
+
+```
+//create a new news serive
+	ns := NewService()
+	defer ns.Stop()
+
+	//create a background context for ns
+	nsBCtx := context.Background()
+
+	//go start must only be called when all the sources have been added otherwise it wont work
+	ns.Start(nsBCtx)
+
+	//making a subscriber one
+	ns.Subscribe("Leonardo", "arts")
+
+	// Create some Mock Source
+	mRCtx := context.Background() //background context for the new mock source
+	m := NewMockSource("mock1")
+	defer m.Stop()
+	//starting m with the created context
+	mCtx := m.Start(mRCtx)
+
+	//add the mock sources to the news service
+	ns.Add(mCtx, m)
+
+	// Publish 10 Stories with mock news 1
+	for i := 1; i <= 10; i++ {
+		st := Article{}
+		st.Body = "The Magic of Art" + fmt.Sprint(i)
+		st.Category = "arts"
+
+		go m.Publish(mCtx, st)
+	}
+
+	//allowing some sleeping time to ensure all go routines get time to complete
+	time.Sleep(5 * time.Millisecond)
+
+	//stopping the news service.
+	ns.Stop()
+```
+
 ## Existing Issues
 
 - [ ] Integration of root command and stream command
-- [ ] The App doesnot wait for message to come but exits once the initial articles are send down from subscribers
+- [ ] The App does not wait for new messages to come but exits once the initial articles are distributed to the subscribers
 - [ ] Integration of defined Errors
 - [ ] I believe that the packages could be better organised
 
