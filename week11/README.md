@@ -56,15 +56,67 @@ go get github.com/arunpariyar/gopherguides-intro-to-go/tree/week11
 
 ##### Service API
 
+```
+type Service struct {
+	subs    map[string]Categories
+	srcs    []string
+	sub_chl map[string]chan News
+	src_chl map[string]chan Article
+	History map[int]News
+	Once    sync.Once
+	stopped bool
+	cancel  context.CancelFunc
+	sync.RWMutex
+}
+```
+
 Service is solely responsible for managing the tasks below
 
 - Generating a news instance of service
+
+  ```
+    func NewService() *Service {...}
+  ```
+
 - Starting a Service
+  ```
+  func (ns *Service) Start(ctx context.Context) {...}
+  ```
 - Creating a new subscriber
+  ```
+  func (ns *Service) Subscribe(n string, cs ...Category) {...}
+  ```
 - Removing an existing subscriber
+  ```
+  func (ns *Service) Unsubscribe(s string) error {...}
+  ```
 - Adding a news source
+  ```
+  func (ns *Service) Add(ctx context.Context, s Source) {...}
+  ```
 - Removing an existing news source
+  ```
+  func (ns *Service) Remove(ctx context.Context, s Source) error {...}
+  ```
+- Keeping watch on the subscriber channels
+  ```
+  func SubListener(ch chan News) {...}
+  ```
+- Listening for articles coming from news sources
+
+  ```
+  func (ns *Service) SrcListener(ctx context.Context, ch chan Article) {...}
+  ```
+
+- Publish news and distribute to relevent subscribers
+  ```
+  func (ns *Service) Publish(n News) {..}
+  ```
 - Stopping its service
+
+  ```
+  func (ns *Service) Stop() {...}
+  ```
 
 #### Predefined Sources (! Only for testing)
 
@@ -91,6 +143,7 @@ A file based news source that reads a JSON files and feeds it to the news servic
 ## Examples
 
 ## Existing Issues
+
 - [x] Design
 
 ## Testing
@@ -112,9 +165,16 @@ if you have any suggestion, please for the repo and create a pull request. You c
 Distributed under the MIT License. See LICENSE.txt for more information.
 
 ## About the author
-Arun Pariyar aspires to be developer but the developement world is huge and its important to find what works, what doesn't, if it clicks or its doesn't, love it or hate it. Author is in currently in this process and heavily suffering from imposter syndrome, some days more that others but he believes in the light at the end of the tunnel. This project is a journey child of exploring the Go Programming Language under the guidance of Gopher Guides Instructor Mark Bates. 
+
+I aspire to be developer but the developement world is huge and its important to find what works, what doesn't, if it clicks or its doesn't, love it or hate it.
+
+I am currently in this process and heavily suffering from imposter syndrome, some days more that others but I believe in the light at the end of the tunnel.
+
+This project is a journey child of exploring the Go Programming Language under the guidance of Gopher Guides Instructor Mark Bates.
 
 ## Acknowlegments
-A journey is owed to those that point the way to the true north,its so easy to feel lost. The Author owes it to the Gopher Guides team Mark Bates and Corey Lou. The Author wouldnt have made it to the finish line otherwise. 
 
-A journey also means meeting others travelling the same route a big thanks to Naveen and Christopher for being the coolest companions to sit beside the fire in cold night and their help in making this project an achievable endeavour.
+A journey is owed to those that point the way to the true north,its so easy to feel lost. I owe it to the Gopher Guides team Mark Bates and Corey Lou. I wouldnt have made it to the finish line otherwise.
+
+A journey also means meeting in the journey as we who become companions.
+My sincerest thanks to Naveen and Christopher for being the most resourceful companions to sit beside the fire in cold night and their help in making this project an achievable endeavour.
